@@ -1,5 +1,13 @@
 /* global $, SYS_CONST, gitbook */
 
+require('./hbshelper');
+require('./comment.less');
+require('simplemde/simplemde.min.css');
+
+const Handlebars = require('handlebars');
+const SimpleMDE = require('simplemde/simplemde.min');
+const commentTpl = require('./comment.hbs').default;
+
 const Cookie = {
     set(key, value, expiration = ''/* millisecond */) {
         const _expires = () => {
@@ -41,15 +49,48 @@ const entry = () => {
         });
     };
 
-    const _showComment = () => {
-        const $contentWrapper = $('.content-wrapper');
-        $contentWrapper.show();
-        $contentWrapper.find('.sign-out-btn').off('click').on('click', () => {
-            /** remove cookie */
-            Cookie.remove('comment.access_token');
-            /** show authorization module */
-            $contentWrapper.hide();
-            _showAuth();
+    const _showComment = (access_token) => {
+        const _getComments = () => {
+            const deferred = $.Deferred();
+            const id = encodeURIComponent(SYS_CONST.repo);
+            const prefix = `${SYS_CONST.host}/api/v4/projects/${id}/repository/commits`;
+            const _url = (url, params) => `${url}?${$.param(Object.assign({
+                access_token,
+            }, params))}`;
+
+            $.get(_url(prefix, {path: SYS_CONST.path})).done(data => {
+                !data.length
+                    ? deferred.resolve([])
+                    : $.when(...data.map(({short_id}) => $.get(_url(`${prefix}/${short_id}/comments`)))).done((...result) => {
+                        deferred.resolve(result.reduce((comments, item) => comments.concat(item[0]), []));
+                    });
+            });
+
+            return deferred.promise();
+        };
+
+        _getComments().then(comments => {
+            const $contentWrapper = $('.content-wrapper');
+
+            $contentWrapper.find('.content').append(`<div>${comments.reduce((tpl, comment) => `${tpl}${Handlebars.compile(commentTpl)(Object.assign(comment, {
+                active: comment.author.state === 'active',
+            }))}`, '')}</div>`).end().find('.sign-out-btn').off('click').on('click', () => {
+                /** remove cookie */
+                Cookie.remove('comment.access_token');
+                /** show authorization module */
+                $contentWrapper.hide();
+                _showAuth();
+            }).end().on('click', 'i[action]', function () {
+                console.log($(this));
+            }).show();
+
+            /** init editor */
+            const editor = new SimpleMDE({
+                element: $contentWrapper.find('.editor textarea')[0],
+                status: false,
+                placeholder: 'Write a comment here...',
+                hideIcons: ['guide'],
+            });
         });
     };
 
@@ -64,7 +105,7 @@ const entry = () => {
         /** todo: check expiration of access token */
         /** update cookie */
         Cookie.set('comment.access_token', accessToken);
-        _showComment();
+        _showComment(accessToken);
     } else {
         /** ask for authorizing */
         _showAuth();
