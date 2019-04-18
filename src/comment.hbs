@@ -1,15 +1,31 @@
-<div class="comment-item clearfix">
-    <img src="{{author.avatar_url}}" class="{{#if active}}active{{/if}}" alt="gitlab-comment-avatar" />
-    <div class="comment-note">{{{markedown note}}}</div>
-    <p class="comment-description">
-        <span class="name">{{author.name}}</span>
-        <span class="username"><a href="{{author.web_url}}" target="_blank">@{{author.username}}</a></span>
-        <span class="comment-footer">
-            · commented <a href="#" title="{{moment created_at}}">{{moment created_at 'fromNow'}}</a>
-        </span>
-        <!--<span class="comment-operations">-->
-            <!--<i class="fa fa-pencil-square-o" title="edit" action="edit"></i>-->
-            <!--<i class="fa fa-trash-o" title="remove" action="remove"></i>-->
-        <!--</span>-->
-    </p>
-</div>
+{{#if this.length}}
+    {{#each this}}
+        <div class="comment-item clearfix" comment-id="{{id}}">
+            <a href="{{author.info}}" target="_blank"><img src="{{author.avatar}}" class="{{#if active}}active{{/if}}"
+                                                           alt="gitlab-comment-avatar"/></a>
+            <div class="comment-note">{{{markedown content}}}</div>
+            <p class="comment-description">
+                <span class="name">{{author.name}}</span>
+                <span class="username"><a href="{{author.info}}" target="_blank">@{{author.username}}</a></span>
+                <span class="comment-footer">
+                    · commented
+                    {{#if updated_at}}
+                        <a href="#" title="{{moment updated_at}}">{{moment updated_at 'fromNow'}}</a>
+                    {{else}}
+                        {{#if created_at}}
+                            <a href="#" title="{{moment created_at}}">{{moment created_at 'fromNow'}}</a>
+                        {{/if}}
+                    {{/if}}
+                </span>
+                {{#if owner}}
+                <span class="comment-operations">
+                        <i class="fa fa-pencil-square-o" title="edit" action="edit"></i>
+                        <i class="fa fa-trash-o" title="remove" action="remove"></i>
+                </span>
+                {{/if}}
+            </p>
+        </div>
+    {{/each}}
+{{else}}
+    <div class="empty-comments comment-item clearfix">Empty Comments</div>
+{{/if}}

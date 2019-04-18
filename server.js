@@ -20,11 +20,31 @@ app.use((req, res, next) => {
     next();
 });
 
+app.get('/gitbook-comments/redirect', (req, res) => {
+    const {
+        redirect,
+        authorized,
+    } = req.query || {};
+
+    res.redirect(301, `${authorized}?${[
+        `client_id=${process.env['CLIENT_ID']}`,
+        `redirect_url=${encodeURIComponent('https://gitbook-comments.herokuapp.com/gitbook-comments/auth')}`,
+        `state=${encodeURIComponent(redirect)}`
+    ].join('&')}`);
+});
+
+app.get('/gitbook-comments/auth', (req, res) => {
+    const {
+        code,
+        state,
+    } = req.query || {};
+
+    res.redirect(301, `${decodeURIComponent(state)}?code=${code}`);
+});
+
 app.post('/gitbook-comments/auth', (req, res) => {
     const {
         type = 'github',
-        client_id,
-        client_secret,
         code,
         redirect_url = '',
     } = req.body || {};
@@ -32,8 +52,8 @@ app.post('/gitbook-comments/auth', (req, res) => {
     switch (type) {
         case 'github':
             axios.post('https://github.com/login/oauth/access_token', {
-                client_id,
-                client_secret,
+                client_id: process.env['CLIENT_ID'],
+                client_secret: process.env['CLIENT_SECRET'],
                 code,
             }).then(({data}) => res.json(_parseParams(data))).catch(error => res.status(500).json({error: error.message}));
             break;

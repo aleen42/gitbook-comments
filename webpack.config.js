@@ -19,11 +19,11 @@
  */
 
 const path = require('path');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
 module.exports = {
     entry: './src/comment.js',
-    mode: 'development',
-    devtool: 'source-map',
+    mode: 'production',
     output: {
         publicPath: '',
         path: path.join(__dirname, 'assets'),
@@ -38,10 +38,15 @@ module.exports = {
             'simplemde': 'simplemde/dist',
         },
     },
+    plugins: [
+        new MiniCssExtractPlugin({
+            filename: 'comment.css',
+        }),
+    ],
     module: {
         rules: [
             {test: /\.hbs$/, loader: 'raw-loader'},
-            {test: /\.(less|css)$/, loader: ['style-loader', 'css-loader', 'less-loader']},
+            {test: /\.(less|css)$/, loader: [MiniCssExtractPlugin.loader, 'css-loader', 'less-loader']},
             {
                 /** babel */
                 test: /\.js?$/,
