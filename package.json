@@ -4,6 +4,7 @@
   "description": "A repo focusing on comments integrated with code management providers like GitLab or GitHub.",
   "main": "./lib/index.js",
   "scripts": {
+    "dev": "webpack --colors --watch",
     "prod": "webpack --colors",
     "start": "node ./server.js"
   },

@@ -23,7 +23,8 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
 module.exports = {
     entry: './src/comment.js',
-    mode: 'production',
+    mode: 'development',
+    devtool: 'inline-source-map',
     output: {
         publicPath: '',
         path: path.join(__dirname, 'assets'),
