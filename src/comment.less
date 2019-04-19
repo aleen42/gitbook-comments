@@ -54,6 +54,17 @@
             }
         }
     }
+
+    img.user-avatar {
+        width: 50px;
+        border-radius: 50%;
+        filter: grayscale(0);
+        float: right;
+
+        &.disabled {
+            filter: grayscale(100%);
+        }
+    }
 }
 
 .comment-copyright {
@@ -124,11 +135,6 @@
             display: none;
             width: 50px;
 
-            img.user-avatar {
-                width: 100%;
-                border-radius: 50%;
-            }
-
             i[action=logout] {
                 position: absolute;
                 top: 0;
@@ -180,8 +186,21 @@
 
         .CodeMirror {
             border: 1px solid #ccc;
-            min-height: 200px;
             height: 200px;
+
+            &-vscrollbar::-webkit-scrollbar {
+                width: 6px;
+                height: 6px;
+            }
+
+            &-vscrollbar::-webkit-scrollbar-button {
+                display: none;
+            }
+
+            &-vscrollbar::-webkit-scrollbar-thumb {
+                background-color: #000;
+                border-radius: 10px
+            }
         }
     }
 
@@ -292,17 +311,8 @@
                     }
                 }
             }
-
-            img {
-                filter: grayscale(100%);
-                width: 50px;
-                border-radius: 50%;
-                float: right;
-
-                &.active {
-                    filter: grayscale(0);
-                }
-            }
         }
     }
 }
+
+

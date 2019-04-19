@@ -12,8 +12,6 @@ const editorTpl = require('./editor.hbs').default;
 const Cookie = require('./cookie');
 const urls = require('./urlset').of(SYS_CONST.type);
 
-const _isGitHub = SYS_CONST.type === 'github';
-
 const entry = () => {
     const $contentWrapper = $('.content-wrapper');
     const $authWrapper = $('.auth-wrapper');
@@ -78,17 +76,8 @@ const entry = () => {
                 const deferred = $.Deferred();
 
                 $.get(_url(urls['files.commits'], {path: SYS_CONST.path})).done(data => {
-                    if (!data.length) {
-                        deferred.resolve([]);
-                        return;
-                    }
-
-                    _isGitHub ? $.get(_url(urls['repo.comments']))
-                            .done(comments => deferred.resolve(comments.filter(({commit_id}) => data.map(({sha}) => sha).includes(commit_id)), data[0]))
-                        : $.when(...data.map(d => $.get(_url(urls['commit.comments'](d)))))
-                            .done((...result) => {
-                                deferred.resolve(result.reduce((comments, item) => comments.concat(item[0]), []), data[0]);
-                            });
+                    $.get(_url(urls['repo.comments']))
+                        .done(comments => deferred.resolve(comments.filter(({path}) => (path || '') === SYS_CONST.path), data[0]));
                 });
 
                 return deferred.promise();
@@ -186,7 +175,9 @@ const entry = () => {
                             if (url && window.confirm('Are you sure you want to delete this?')) {
                                 $loading = _loading($content);
                                 $.ajax({url: _url(url), type: 'DELETE'}).done(() => {
-                                    $item.fadeOut();
+                                    $content.find('.comment-item:visible').length === 1
+                                        ? $item.replaceWith(Handlebars.compile(commentTpl)([]))
+                                        : $item.fadeOut();
                                     $loading.hide();
                                 });
                             }
@@ -200,13 +191,17 @@ const entry = () => {
                                     type: 'POST',
                                     data: JSON.stringify({
                                         body: editor.value(),
+                                        path: SYS_CONST.path,
                                     }),
                                     dataType: 'json',
                                     processData: false,
                                     contentType: 'application/json; charset=utf-8',
                                 },).done(comment => {
+                                    const $emptyItem = $content.find('.empty-comments');
                                     const $item = $(Handlebars.compile(commentTpl)([_handleCommentData(comment)]));
-                                    $item.hide().appendTo($content).fadeIn();
+
+                                    $emptyItem.length ? $emptyItem.replaceWith($item.hide()) : $item.hide().appendTo($content);
+                                    $item.fadeIn();
                                     /** clear editor */
                                     editor.value('');
                                     $loading.hide();
