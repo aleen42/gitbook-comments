@@ -2,7 +2,6 @@
 
 require('./hbshelper');
 require('./comment.less');
-require('simplemde/simplemde.min.css');
 
 const Handlebars = require('handlebars');
 const SimpleMDE = require('simplemde/simplemde.min');

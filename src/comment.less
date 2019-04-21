@@ -1,3 +1,5 @@
+@import "./editor.less";
+
 .clearfix {
     zoom: 1;
     &:before,
@@ -142,7 +144,7 @@
                 width: 100%;
                 height: 50px;
                 border-radius: 50%;
-                background: rgba(0, 0, 0, 0.5);
+                background-color: rgba(0, 0, 0, 0.5);
                 line-height: 50px;
                 color: #efefef;
                 text-align: center;
@@ -157,18 +159,6 @@
             }
         }
 
-        a:hover,
-        a:focus {
-            background: none;
-            border: none;
-        }
-
-        a.fa {
-            color: #000 !important;
-            font-weight: bold;
-            font-size: 14px;
-        }
-
         .editor-toolbar {
             border-top: 1px solid #ccc;
             border-left: 1px solid #ccc;
@@ -176,6 +166,9 @@
             opacity: 1;
 
             a.fa {
+                color: #000;
+                font-weight: bold;
+                font-size: 14px;
                 border: none;
             }
         }
@@ -187,6 +180,12 @@
         .CodeMirror {
             border: 1px solid #ccc;
             height: 200px;
+            background-color: #fff;
+
+            pre.CodeMirror-line {
+                background: initial !important;
+                border-color: initial !important;
+            }
 
             &-vscrollbar::-webkit-scrollbar {
                 width: 6px;
@@ -233,6 +232,7 @@
             width: 3px;
             display: inline-block;
             animation: stretchdelay 1.2s infinite ease-in-out;
+            background-color: #000;
         }
 
         @-webkit-keyframes stretchdelay {
@@ -315,4 +315,61 @@
     }
 }
 
+@media (max-width: 720px) {
+    .comment-copyright .content {
+        display: none;
+    }
 
+    .content-wrapper {
+        .comment-list {
+            div.comment-item {
+                .comment-note {
+                    width: 100%;
+                    margin-top: 50px;
+                }
+
+                .comment-description {
+                    .name {
+                        display: none;
+                    }
+                }
+            }
+        }
+    }
+}
+
+/** take up GitBook styles */
+.book {
+    .navigation,
+    .book-header {
+        z-index: 3;
+    }
+
+    &.color-theme-1 {
+        .CodeMirror,
+        .editor-preview,
+        .editor-preview-side {
+            background-color: #f3eacb;
+        }
+
+        .content-wrapper div.loading-item {
+            background-color: rgba(243, 234, 203, 0.8);
+        }
+    }
+
+    &.color-theme-2 {
+        .CodeMirror,
+        .editor-preview,
+        .editor-preview-side {
+            background-color: #1c1f2b;
+        }
+
+        .content-wrapper div.loading-item {
+            background-color: rgba(28, 31, 43, 0.8);
+
+            .loading > div {
+                background-color: #fff;
+            }
+        }
+    }
+}
