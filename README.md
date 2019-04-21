@@ -22,7 +22,9 @@ Add the following plugins to your `book.json` and run the command `gitbook insta
 
 Just find the plugin on GitBook and install it on your project.
 
-Configuration option can be set as an object like the following snippet:
+And then, install [the GitHub app](https://github.com/apps/aleen42-gitbook-comments) in your repository for accessing comments.
+
+Configuration options can be set as an object like the following snippet:
 
 ```json
 {
@@ -33,7 +35,6 @@ Configuration option can be set as an object like the following snippet:
 		"comments-footer": {
 			"type": "github",
 			"repo": "aleen42/PersonalWiki",
-			"redirect": "https://aleen42.github.io/PersonalWiki/",
 			"copyright": "Copyright © aleen42"
 		}
 	}
