@@ -1,6 +1,6 @@
 ## gitbook-comments
 
-A repo focusing on comments integrated with code management providers like GitLab or GitHub.
+A project focusing on comments integrated with code management providers like GitLab or GitHub.
 
 ![gitbook](https://aleen42.github.io/badges/src/gitbook_1.svg) ![gitbook](https://aleen42.github.io/badges/src/gitbook_2.svg) [![GitHub issues](https://img.shields.io/github/issues/aleen42/gitbook-comments.svg)](https://github.com/aleen42/gitbook-comments/issues) [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/aleen42/gitbook-comments/master/LICENSE)
 
@@ -20,9 +20,7 @@ Add the following plugins to your `book.json` and run the command `gitbook insta
 
 ### Usage
 
-Just find the plugin on GitBook and install it on your project.
-
-And then, install [the GitHub app](https://github.com/apps/aleen42-gitbook-comments) in your repository for accessing comments.
+Install [the GitHub app](https://github.com/apps/aleen42-gitbook-comments) in your repository for accessing comments firstly.
 
 Configuration options can be set as an object like the following snippet:
 
@@ -43,8 +41,8 @@ Configuration options can be set as an object like the following snippet:
 
 ### TODO
 
-- [ ] exposing states of subscribing.
-- [ ] GitLab features have to wait for the functions around commit comments: https://gitlab.com/gitlab-org/gitlab-ce/issues/59798.
+- [ ] Disable subscribing states when commenting on articles.
+- [ ] GitLab features depend on the functions around commit comments: https://gitlab.com/gitlab-org/gitlab-ce/issues/59798.
 
 ### Release History
 
