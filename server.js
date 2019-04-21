@@ -20,6 +20,13 @@ app.use((req, res, next) => {
     next();
 });
 
+app.post('/gitbook-comments/token', (req, res) => {
+    res.json({
+        token: process.env['GITHUB_TOKEN'] || '',
+        message: 'only accessible for "repo:status"',
+    });
+});
+
 app.get('/gitbook-comments/redirect', (req, res) => {
     const {
         type = 'github',

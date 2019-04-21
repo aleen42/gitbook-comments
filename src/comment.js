@@ -226,7 +226,9 @@ const entry = () => {
             location.href = urls['oauth.redirect']();
         });
 
-        _showComment(SYS_CONST.token);
+        $.post(urls['token']).done(({token}) => {
+            _showComment(SYS_CONST.token || token);
+        });
     };
 
     const _parseParams = str => str.split('&').map(item => item.split('=')).reduce((obj, item) => {
