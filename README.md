@@ -52,6 +52,7 @@ Configuration options can be set as an object like the following snippet:
 	* 1.1.4 fix bug
 	* 1.1.5 enhancement for reducing authorizing redirecting
 	* 1.1.6 enhancement of compatible styles
+	* 1.1.9 styles for the authorization wrapper and unexpected redirect url
 
 ### :fuelpump: How to contribute
 
