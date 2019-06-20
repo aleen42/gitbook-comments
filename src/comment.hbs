@@ -1,6 +1,6 @@
 {{#if this.length}}
     {{#each this}}
-        <div class="comment-item clearfix" comment-id="{{id}}">
+        <div class="comment-item clearfix" comment-id="{{id}}" commit-id="{{commitId}}" discussion-id="{{discussionId}}">
             <a href="{{author.info}}" target="_blank"><img src="{{author.avatar}}" class="user-avatar {{#unless active}}disabled{{/unless}}"
                                                            alt="gitlab-comment-avatar"/></a>
             <div class="comment-note">{{{markedown content}}}</div>

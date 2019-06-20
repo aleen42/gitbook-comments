@@ -10,6 +10,7 @@ const loadingTpl = require('./loading.hbs').default;
 const editorTpl = require('./editor.hbs').default;
 const Cookie = require('./cookie');
 const urls = require('./urlset').of(SYS_CONST.type);
+const isGitLab = SYS_CONST.type === 'gitlab';
 
 const entry = () => {
     const $contentWrapper = $('.content-wrapper');
@@ -19,9 +20,9 @@ const entry = () => {
     const $authWrapper = $contentWrapper.find('.auth-wrapper');
 
     /** url wrapper */
-    const _wrapUrl = access_token => (url, params) => `${url}?${$.param(Object.assign({
+    const _wrapUrl = access_token => (url, params) => `${url}?${$.param(Object.assign(access_token ? {
         access_token,
-    }, params))}`;
+    } : {}, params))}`;
 
     /** editor initialization wrapper */
     const _initEditor = element => new SimpleMDE({
@@ -63,18 +64,20 @@ const entry = () => {
             updated_at: comment['updated_at'],
             owner: comment.user['id'] === currentUserId,
         }),
-        gitlab: comment => ({
-            id: '',
+        gitlab: (comment, currentUserId) => ({
+            id: comment['id'],
             author: {
                 avatar: comment.author['avatar_url'],
                 name: comment.author['name'],
                 username: comment.author['username'],
                 info: comment.author['web_url']
             },
-            content: comment['note'],
+            content: comment['body'],
             active: comment.author.state === 'active',
             created_at: comment['created_at'],
-            owner: false,
+            owner: comment.author['id'] === currentUserId,
+            commitId: comment.commitId,
+            discussionId: comment.discussionId,
         }),
     })[SYS_CONST.type];
 
@@ -91,8 +94,33 @@ const entry = () => {
             const deferred = $.Deferred();
 
             $.get(_url(urls['files.commits'], {path: SYS_CONST.path})).done(data => {
-                $.get(_url(urls['repo.comments']))
-                    .done(comments => deferred.resolve(comments.filter(({path}) => (path || '') === SYS_CONST.path), data[0]));
+                $.when.apply($, (isGitLab
+                    ? data.map(commit => _url(urls['commit.comments'](commit)))
+                    : [_url(urls['repo.comments'])]).map((url, index) => {
+                        const dfd = $.Deferred();
+                        $.get(url).done(result => {
+                            dfd.resolve(isGitLab ? result.map((({id, notes}) => Object.assign(notes[0], {
+                                discussionId: id,
+                                commitId: data[index].id,
+                            }))) : result);
+                        });
+                        return dfd.promise();
+                    })
+                ).done((...comments) => {
+                    comments = [].concat(...comments);
+
+                    if (isGitLab) {
+                        $.get(_url(urls['commit.diff'](data[0]))).done(diffs => diffs.forEach(({new_path, diff}) => {
+                            new_path === SYS_CONST.path && deferred.resolve(
+                                comments.filter(comment => (comment.position && comment.position['new_path'] || '') === SYS_CONST.path)
+                                , Object.assign(data[0], {diff})
+                            );
+                        }));
+                    } else {
+                        deferred.resolve(comments.filter(({path}) => (path || '') === SYS_CONST.path), data[0]);
+                    }
+
+                });
             });
 
             return deferred.promise();
@@ -121,7 +149,10 @@ const entry = () => {
                         $page.animate({scrollTop: $page[0].scrollTop + $('#comment-wrapper').offset().top - 50});
                         break;
                     case 'edit':
-                        url = urls['comment']($item.attr('comment-id'));
+                        url = isGitLab
+                            ? urls['comment'](void 0, $item.attr('commit-id'), $item.attr('discussion-id'))
+                            : urls['comment']($item.attr('comment-id'));
+
                         if (url && !$noteItem.hasClass('editor')) {
                             $noteItem.data('origin', $noteItem.html())
                                 .addClass('editor').html(Handlebars.compile(editorTpl)({modify: true}));
@@ -131,18 +162,21 @@ const entry = () => {
 
                             $loading = _loading($noteItem);
                             $.get(_url(url)).done(comment => {
-                                editor.value(_handleCommentData(comment, uid).content);
+                                editor.value(_handleCommentData(isGitLab ? Object.assign(comment.notes[0], {
+                                    commitId: $item.attr('commit-id'),
+                                    discussionId: $item.attr('discussion-id'),
+                                }) : comment, uid).content);
                                 $loading.hide();
                             });
                         }
                         break;
                     case 'modify':
-                        url = urls['comment']($item.attr('comment-id'));
+                        url = urls['comment']($item.attr('comment-id'), $item.attr('commit-id'), $item.attr('discussion-id'));
                         if (url) {
                             $loading = _loading($noteItem);
                             $.ajax({
                                 url: _url(url),
-                                type: 'PATCH',
+                                type: isGitLab ? 'PUT' : 'PATCH',
                                 data: JSON.stringify({
                                     body: $noteItem.data('editor').value(),
                                 }),
@@ -158,7 +192,7 @@ const entry = () => {
                         $noteItem.html($noteItem.data('origin')).removeClass('editor');
                         break;
                     case 'remove':
-                        url = urls['comment']($item.attr('comment-id'));
+                        url = urls['comment']($item.attr('comment-id'), $item.attr('commit-id'), $item.attr('discussion-id'));
                         if (url && window.confirm('Are you sure you want to delete this?')) {
                             $loading = _loading($content);
                             $.ajax({url: _url(url), type: 'DELETE'}).done(() => {
@@ -176,16 +210,31 @@ const entry = () => {
                             $.ajax({
                                 url: _url(url),
                                 type: 'POST',
-                                data: JSON.stringify({
+                                data: JSON.stringify(Object.assign({
                                     body: editor.value(),
-                                    path: SYS_CONST.path,
-                                }),
+                                }, isGitLab ? {
+                                    position: {
+                                        'base_sha': latestCommit.parent_ids[0],
+                                        'start_sha': latestCommit.parent_ids[0],
+                                        'head_sha': latestCommit.id,
+                                        'position_type': 'text',
+                                        'new_path': SYS_CONST.path,
+                                        /** create a discussion at the last line of the specific commit */
+                                        /** @@ -48,4 +48,6 @@ */
+                                        'new_line': latestCommit.diff.match(/@@\s.*?\s\+(.*?)\s@@/i)[1]
+                                            .split(',')
+                                            .reduce((line, i) => line + parseInt(i, 10), 0) - 1,
+                                    },
+                                } : {path: SYS_CONST.path})),
                                 dataType: 'json',
                                 processData: false,
                                 contentType: 'application/json; charset=utf-8',
                             },).done(comment => {
                                 const $emptyItem = $content.find('.empty-comments');
-                                const $item = $(Handlebars.compile(commentTpl)([_handleCommentData(comment, uid)]));
+                                const $item = $(Handlebars.compile(commentTpl)([_handleCommentData(isGitLab ? Object.assign(comment.notes[0], {
+                                    commitId: latestCommit.id,
+                                    discussionId: comment.id,
+                                }) : comment, uid)]));
 
                                 $emptyItem.length ? $emptyItem.replaceWith($item.hide()) : $item.hide().appendTo($content);
                                 $item.fadeIn();
@@ -225,9 +274,7 @@ const entry = () => {
             location.href = urls['oauth.redirect']();
         });
 
-        $.post(urls['token']).done(({token}) => {
-            _showComment(SYS_CONST.token || token);
-        });
+        isGitLab ? $commentWrapper.hide() : $.post(urls['token']).done(({token}) => _showComment(SYS_CONST.token || token));
     };
 
     const _parseParams = str => str.split('&').map(item => item.split('=')).reduce((obj, item) => {
