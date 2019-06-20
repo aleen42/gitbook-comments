@@ -196,7 +196,10 @@ const entry = () => {
                                 processData: false,
                                 contentType: 'application/json; charset=utf-8',
                             },).done(comment => {
-                                $item.replaceWith($(Handlebars.compile(commentTpl)([_handleCommentData(comment, uid)])));
+                                $item.replaceWith($(Handlebars.compile(commentTpl)([_handleCommentData(isGitLab ? Object.assign(comment, {
+                                    commitId: $item.attr('commit-id'),
+                                    discussionId: $item.attr('discussion-id'),
+                                }) : comment, uid)])));
                             });
                         }
                         break;
