@@ -14,7 +14,7 @@ Add the following plugins to your `book.json` and run the command `gitbook insta
 
 ```json
 {
-    "plugins": ["comments-footer"]
+	"plugins": ["comments-footer"]
 }
 ```
 
@@ -64,8 +64,8 @@ And then, the configuration option can be set as an object like the following sn
 			"repo": "fe-components/fe-documents",
 			"copyright": "Copyright © aleen42",
 			"redirect": "xxx",
-            "clientId": "xxx",
-            "host": "http://git.xxx.cn/"
+			"clientId": "xxx",
+			"host": "http://git.xxx.cn/"
 		}
 	}
 }
