@@ -50,7 +50,7 @@ const entry = () => {
 
     /** comment data handler */
     const _handleCommentData = ({
-        github: (comment, currentUserId) => ({
+        github: (comment, currentUserId, replace = true) => ({
             id: comment['id'],
             author: {
                 avatar: comment.user['avatar_url'],
@@ -58,14 +58,14 @@ const entry = () => {
                 username: comment.user['login'],
                 info: comment.user['html_url']
             },
-            content: comment['body'].replace(/@(\w+)/g, `[$&](https://github.com/$1)`)
+            content: comment['body'].replace(/@(\w+)/g, replace ? `[$&](https://github.com/$1)` : '$&')
                 .replace(/\n\n—\n\n\[View it on GitBook]\(.*?\)/g, ''),
             active: true,
             created_at: comment['created_at'],
             updated_at: comment['updated_at'],
             owner: comment.user['id'] === currentUserId,
         }),
-        gitlab: (comment, currentUserId) => ({
+        gitlab: (comment, currentUserId, replace = true) => ({
             id: comment['id'],
             author: {
                 avatar: comment.author['avatar_url'],
@@ -73,7 +73,7 @@ const entry = () => {
                 username: comment.author['username'],
                 info: comment.author['web_url']
             },
-            content: comment['body'].replace(/@(\w+)/g, `[$&](${SYS_CONST.host}/$1)`)
+            content: comment['body'].replace(/@(\w+)/g, replace ? `[$&](${SYS_CONST.host}/$1)` : '$&')
                 .replace(/\n\n—\n\n\[View it on GitBook]\(.*?\)/g, ''),
             active: comment.author.state === 'active',
             created_at: comment['created_at'],
@@ -199,7 +199,7 @@ const entry = () => {
                                 editor.value(_handleCommentData(isGitLab ? Object.assign(comment.notes[0], {
                                     commitId: $item.attr('commit-id'),
                                     discussionId: $item.attr('discussion-id'),
-                                }) : comment, uid).content);
+                                }) : comment, uid, false).content);
                                 $loading.hide();
                             });
                         }
