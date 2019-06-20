@@ -58,7 +58,7 @@ const entry = () => {
                 username: comment.user['login'],
                 info: comment.user['html_url']
             },
-            content: comment['body'],
+            content: comment['body'].replace(/@(\w+)/g, `[$&](https://github.com/$1)`),
             active: true,
             created_at: comment['created_at'],
             updated_at: comment['updated_at'],
@@ -72,7 +72,7 @@ const entry = () => {
                 username: comment.author['username'],
                 info: comment.author['web_url']
             },
-            content: comment['body'],
+            content: comment['body'].replace(/@(\w+)/g, `[$&](${SYS_CONST.host}/$1)`),
             active: comment.author.state === 'active',
             created_at: comment['created_at'],
             updated_at: comment['updated_at'],
