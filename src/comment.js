@@ -117,7 +117,11 @@ const entry = () => {
                                 , Object.assign(data[0], {
                                     diff: Object.assign(diff, {
                                         /** @@ -48,4 +48,6 @@ */
-                                        lastLine: diff.match(/@@\s.*?\s\+(.*?)\s@@/i)[1]
+                                        /** @@ -0,0 +1,48 @@ */
+                                        oldLine: diff.match(/@@\s(.*?)\s\+.*?\s@@/i)[1]
+                                            .split(',')
+                                            .reduce((line, i) => line + parseInt(i, 10), 0) - 1,
+                                        newLine: diff.match(/@@\s.*?\s\+(.*?)\s@@/i)[1]
                                             .split(',')
                                             .reduce((line, i) => line + parseInt(i, 10), 0) - 1
                                     }),
@@ -221,16 +225,17 @@ const entry = () => {
                                 data: JSON.stringify(Object.assign({
                                     body: editor.value(),
                                 }, isGitLab ? {
-                                    position: {
+                                    position: Object.assign({
                                         'base_sha': latestCommit.parent_ids[0],
                                         'start_sha': latestCommit.parent_ids[0],
                                         'head_sha': latestCommit.id,
                                         'position_type': 'text',
                                         'new_path': SYS_CONST.path,
                                         /** create a discussion at the last line of the specific commit */
-                                        'old_line': latestCommit.diff.lastLine,
-                                        'new_line': latestCommit.diff.lastLine,
-                                    },
+                                        'new_line': latestCommit.diff.newLine,
+                                    }, latestCommit.diff.oldLine > 0 ? {
+                                        'old_line': latestCommit.diff.oldLine,
+                                    } : {}),
                                 } : {path: SYS_CONST.path})),
                                 dataType: 'json',
                                 processData: false,
