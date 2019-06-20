@@ -114,7 +114,14 @@ const entry = () => {
                         $.get(_url(urls['commit.diff'](data[0]))).done(diffs => diffs.forEach(({new_path, diff}) => {
                             new_path === SYS_CONST.path && deferred.resolve(
                                 comments.filter(comment => (comment.position && comment.position['new_path'] || '') === SYS_CONST.path)
-                                , Object.assign(data[0], {diff})
+                                , Object.assign(data[0], {
+                                    diff: Object.assign(diff, {
+                                        /** @@ -48,4 +48,6 @@ */
+                                        lastLine: diff.match(/@@\s.*?\s\+(.*?)\s@@/i)[1]
+                                            .split(',')
+                                            .reduce((line, i) => line + parseInt(i, 10), 0) - 1
+                                    }),
+                                })
                             );
                         }));
                     } else {
@@ -221,10 +228,8 @@ const entry = () => {
                                         'position_type': 'text',
                                         'new_path': SYS_CONST.path,
                                         /** create a discussion at the last line of the specific commit */
-                                        /** @@ -48,4 +48,6 @@ */
-                                        'new_line': latestCommit.diff.match(/@@\s.*?\s\+(.*?)\s@@/i)[1]
-                                            .split(',')
-                                            .reduce((line, i) => line + parseInt(i, 10), 0) - 1,
+                                        'old_line': latestCommit.diff.lastLine,
+                                        'new_line': latestCommit.diff.lastLine,
                                     },
                                 } : {path: SYS_CONST.path})),
                                 dataType: 'json',
