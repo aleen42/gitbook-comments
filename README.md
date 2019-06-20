@@ -94,6 +94,7 @@ And then, the configuration option can be set as an object like the following sn
 	* 1.2.0 support GitLab
 	* 1.2.2 fix commented time and passed parameters when leaving comments in GitLab
 	* 1.2.3 show user link anchor
+	* 1.2.5 bug fix and show site link after leaving comments
 
 ### :fuelpump: How to contribute
 
