@@ -92,6 +92,7 @@ And then, the configuration option can be set as an object like the following sn
 	* 1.1.6 enhancement of compatible styles
 	* 1.1.9 styles for the authorization wrapper and unexpected redirect url
 	* 1.2.0 support GitLab
+	* 1.2.2 fix commented time and passed parameters when leaving comments in GitLab
 
 ### :fuelpump: How to contribute
 
