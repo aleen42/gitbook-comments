@@ -20,9 +20,11 @@ Add the following plugins to your `book.json` and run the command `gitbook insta
 
 ### Usage
 
-Install [the GitHub app](https://github.com/apps/aleen42-gitbook-comments) in your repository for accessing comments firstly.
+#### 1. GitHub
 
-Configuration options can be set as an object like the following snippet:
+To use this plugin in a GitBook project deployed on GitHub, the first step is to install [the GitHub app](https://github.com/apps/aleen42-gitbook-comments) in your repository for accessing.
+
+And then, the configuration option can be set as an object like the following snippet:
 
 ```json
 {
@@ -39,10 +41,46 @@ Configuration options can be set as an object like the following snippet:
 }
 ```
 
+#### 2. GitLab
+
+What if using it in GitLab? You may need to create an application yourself with `API` scope accessing.
+
+![gitbook-comments](./gitlab_application.png)
+
+- **Name**: any name you want
+- **Redirect URI**: the page url you published
+- **Scopes**: choose `api`
+
+And then, the configuration option can be set as an object like the following snippet:
+
+```json
+{
+	"plugins": [
+		"comments-footer"
+	],
+	"pluginsConfig": {
+		"comments-footer": {
+			"type": "gitlab",
+			"repo": "fe-components/fe-documents",
+			"copyright": "Copyright © aleen42",
+			"redirect": "xxx",
+            "clientId": "xxx",
+            "host": "http://git.xxx.cn/"
+		}
+	}
+}
+```
+
+- **redirect**: the page url you published
+- **clientId**: the Application ID of your application created above
+- **host**: the GitLab server host
+
 ### TODO
 
 - [ ] Disable subscribing states when commenting on articles.
-- [ ] GitLab features depend on the functions around commit comments: https://gitlab.com/gitlab-org/gitlab-ce/issues/59798.
+- [ ] Discussion features on GitLab.
+- [x] ~~GitLab features depend on the functions around commit comments: https://gitlab.com/gitlab-org/gitlab-ce/issues/59798.~~ Use discussion instead.
+- [x] ~~GitLab private access token has no detailed scope for avoiding abusing by others.~~ It means that I cannot get discussions when users do not authorize themselves.
 
 ### Release History
 
@@ -53,6 +91,7 @@ Configuration options can be set as an object like the following snippet:
 	* 1.1.5 enhancement for reducing authorizing redirecting
 	* 1.1.6 enhancement of compatible styles
 	* 1.1.9 styles for the authorization wrapper and unexpected redirect url
+	* 1.2.0 support GitLab
 
 ### :fuelpump: How to contribute
 
