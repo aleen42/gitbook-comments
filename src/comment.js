@@ -96,46 +96,66 @@ const entry = () => {
         const _getComments = () => {
             const deferred = $.Deferred();
 
-            $.get(_url(urls['files.commits'], {path: SYS_CONST.path})).done(data => {
-                $.when.apply($, (isGitLab
-                    ? data.map(commit => _url(urls['commit.comments'](commit)))
-                    : [_url(urls['repo.comments'])]).map((url, index) => {
-                        const dfd = $.Deferred();
-                        $.get(url).done(result => {
-                            dfd.resolve(isGitLab ? result.map((({id, notes}) => Object.assign(notes[0], {
-                                discussionId: id,
-                                commitId: data[index].id,
-                            }))) : result);
-                        });
-                        return dfd.promise();
-                    })
-                ).done((...comments) => {
-                    comments = [].concat(...comments);
+            let _listCommits;
+            let commits = [];
 
-                    if (isGitLab) {
-                        $.get(_url(urls['commit.diff'](data[0]))).done(diffs => diffs.forEach(({new_path, diff}) => {
-                            new_path === SYS_CONST.path && deferred.resolve(
-                                comments.filter(comment => (comment.position && comment.position['new_path'] || '') === SYS_CONST.path)
-                                , Object.assign(data[0], {
-                                    diff: Object.assign(diff, {
-                                        /** @@ -48,4 +48,6 @@ */
-                                        /** @@ -0,0 +1,48 @@ */
-                                        oldLine: diff.match(/@@\s(.*?)\s\+.*?\s@@/i)[1]
-                                            .split(',')
-                                            .reduce((line, i) => line + parseInt(i, 10), 0) - 1,
-                                        newLine: diff.match(/@@\s.*?\s\+(.*?)\s@@/i)[1]
-                                            .split(',')
-                                            .reduce((line, i) => line + parseInt(i, 10), 0) - 1
-                                    }),
-                                })
-                            );
-                        }));
+            (_listCommits = (pageNum, all = true) => {
+                $.get(_url(urls['files.commits'], {
+                    path: SYS_CONST.path,
+                    page: pageNum,
+                    'per_page': 100,
+                    all,
+                })).done(data => {
+                    if (data.length) {
+                        commits = [...commits, ...data];
+                        _listCommits(++pageNum);
                     } else {
-                        deferred.resolve(comments.filter(({path}) => (path || '') === SYS_CONST.path), data[0]);
-                    }
+                        if (!commits.length) {
+                            /** sometimes the commit may lose when searching all commits */
+                            all && _listCommits(1, false);
+                            return;
+                        }
 
-                });
-            });
+                        $.when.apply($, (isGitLab
+                            ? commits.map(commit => _url(urls['commit.comments'](commit)))
+                            : [_url(urls['repo.comments'])]).map((url, index) => {
+                                const dfd = $.Deferred();
+                                $.get(url).done(result => {
+                                    dfd.resolve(isGitLab ? result.map((({id, notes}) => Object.assign(notes[0], {
+                                        discussionId: id,
+                                        commitId: commits[index].id,
+                                    }))) : result);
+                                });
+                                return dfd.promise();
+                            })
+                        ).done((...comments) => {
+                            comments = [].concat(...comments);
+
+                            if (isGitLab) {
+                                $.get(_url(urls['commit.diff'](commits[commits.length - 1]))).done(diffs => diffs.forEach(({new_path, diff}) => {
+                                    new_path === SYS_CONST.path && deferred.resolve(
+                                        comments.filter(comment => (comment.position && comment.position['new_path'] || '') === SYS_CONST.path)
+                                        , Object.assign(commits[commits.length - 1], {
+                                            diff: Object.assign(diff, {
+                                                /** @@ -48,4 +48,6 @@ */
+                                                /** @@ -0,0 +1,48 @@ */
+                                                oldLine: diff.match(/@@\s(.*?)\s\+.*?\s@@/i)[1]
+                                                    .split(',')
+                                                    .reduce((line, i) => line + parseInt(i, 10), 0) - 1,
+                                                newLine: diff.match(/@@\s.*?\s\+(.*?)\s@@/i)[1]
+                                                    .split(',')
+                                                    .reduce((line, i) => line + parseInt(i, 10), 0) - 1
+                                            }),
+                                        })
+                                    );
+                                }));
+                            } else {
+                                deferred.resolve(comments.filter(({path}) => (path || '') === SYS_CONST.path), commits[commits.length - 1]);
+                            }
+                        });
+                    }
+                })
+            })(1);
 
             return deferred.promise();
         };
