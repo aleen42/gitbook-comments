@@ -2,9 +2,9 @@
 
 A project focusing on comments integrated with code management providers like GitLab or GitHub.
 
-![gitbook](https://aleen42.github.io/badges/src/gitbook_1.svg) ![gitbook](https://aleen42.github.io/badges/src/gitbook_2.svg) [![GitHub issues](https://img.shields.io/github/issues/aleen42/gitbook-comments.svg)](https://github.com/aleen42/gitbook-comments/issues) [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/aleen42/gitbook-comments/master/LICENSE)
+![npm](https://aleen42.github.io/badges/src/npm.svg) ![javascript](https://aleen42.github.io/badges/src/javascript.svg) ![gitbook](https://aleen42.github.io/badges/src/gitbook_1.svg) ![gitbook](https://aleen42.github.io/badges/src/gitbook_2.svg)
 
-[![npm](https://img.shields.io/npm/v/gitbook-plugin-comments-footer.svg)](https://www.npmjs.com/package/gitbook-plugin-comments-footer) [![devDependency Status](https://david-dm.org/aleen42/gitbook-comments/dev-status.svg)](https://david-dm.org/aleen42/gitbook-comments#info=devDependencies) [![npm](https://img.shields.io/npm/dt/gitbook-plugin-comments-footer.svg)](https://www.npmjs.com/package/gitbook-plugin-comments-footer)
+![](https://img.shields.io/badge/%20%20JavaScript-%20%20%20%2041,324L-f1e05a.svg) ![](https://img.shields.io/badge/%20%20CSS-%20%20%20%20937L-563d7c.svg) [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/aleen42/gitbook-comments/master/LICENSE) [![npm](https://img.shields.io/npm/dt/gitbook-plugin-comments-footer.svg)](https://www.npmjs.com/package/gitbook-plugin-comments-footer)
 
 ![comments-footer](./preview.png)
 
