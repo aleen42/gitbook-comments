@@ -58,7 +58,8 @@ const entry = () => {
                 username: comment.user['login'],
                 info: comment.user['html_url']
             },
-            content: comment['body'].replace(/@(\w+)/g, `[$&](https://github.com/$1)`),
+            content: comment['body'].replace(/@(\w+)/g, `[$&](https://github.com/$1)`)
+                .replace(/\n\n—\n\n\[View it on GitBook]\(.*?\)/g, ''),
             active: true,
             created_at: comment['created_at'],
             updated_at: comment['updated_at'],
@@ -72,7 +73,8 @@ const entry = () => {
                 username: comment.author['username'],
                 info: comment.author['web_url']
             },
-            content: comment['body'].replace(/@(\w+)/g, `[$&](${SYS_CONST.host}/$1)`),
+            content: comment['body'].replace(/@(\w+)/g, `[$&](${SYS_CONST.host}/$1)`)
+                .replace(/\n\n—\n\n\[View it on GitBook]\(.*?\)/g, ''),
             active: comment.author.state === 'active',
             created_at: comment['created_at'],
             updated_at: comment['updated_at'],
@@ -190,7 +192,7 @@ const entry = () => {
                                 url: _url(url),
                                 type: isGitLab ? 'PUT' : 'PATCH',
                                 data: JSON.stringify({
-                                    body: $noteItem.data('editor').value(),
+                                    body: `${$noteItem.data('editor').value()}\n\n—\n\n[View it on GitBook](${location.href.replace(/#.*$/gi, '')}#comment-wrapper)`,
                                 }),
                                 dataType: 'json',
                                 processData: false,
@@ -226,7 +228,7 @@ const entry = () => {
                                 url: _url(url),
                                 type: 'POST',
                                 data: JSON.stringify(Object.assign({
-                                    body: editor.value(),
+                                    body: `${editor.value()}\n\n—\n\n[View it on GitBook](${location.href.replace(/#.*$/gi, '')}#comment-wrapper)`,
                                 }, isGitLab ? {
                                     position: Object.assign({
                                         'base_sha': latestCommit.parent_ids[0],
