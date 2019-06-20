@@ -75,6 +75,7 @@ const entry = () => {
             content: comment['body'],
             active: comment.author.state === 'active',
             created_at: comment['created_at'],
+            updated_at: comment['updated_at'],
             owner: comment.author['id'] === currentUserId,
             commitId: comment.commitId,
             discussionId: comment.discussionId,
