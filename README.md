@@ -97,6 +97,7 @@ And then, the configuration option can be set as an object like the following sn
 	* 1.2.5 bug fix and show site link after leaving comments
 	* 1.2.7 list all commits recursively
 	* 1.2.9 bug fix
+	* 1.3.0 more restrict regression for matching commit difference
 
 ### :fuelpump: How to contribute
 
