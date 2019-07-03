@@ -139,10 +139,10 @@ const entry = () => {
                                             diff: Object.assign(diff, {
                                                 /** @@ -48,4 +48,6 @@ */
                                                 /** @@ -0,0 +1,48 @@ */
-                                                oldLine: diff.match(/@@\s(.*?)\s\+.*?\s@@/i)[1]
+                                                oldLine: diff.match(/@@\s-(.*?)\s\+.*?\s@@/i)[1]
                                                     .split(',')
                                                     .reduce((line, i) => line + parseInt(i, 10), 0) - 1,
-                                                newLine: diff.match(/@@\s.*?\s\+(.*?)\s@@/i)[1]
+                                                newLine: diff.match(/@@\s-.*?\s\+(.*?)\s@@/i)[1]
                                                     .split(',')
                                                     .reduce((line, i) => line + parseInt(i, 10), 0) - 1
                                             }),
