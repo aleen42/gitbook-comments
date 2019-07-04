@@ -4,7 +4,7 @@ A project focusing on comments integrated with code management providers like Gi
 
 ![npm](https://aleen42.github.io/badges/src/npm.svg) ![javascript](https://aleen42.github.io/badges/src/javascript.svg) ![gitbook](https://aleen42.github.io/badges/src/gitbook_1.svg) ![gitbook](https://aleen42.github.io/badges/src/gitbook_2.svg)
 
-![](https://img.shields.io/badge/%20%20JavaScript-%20%20%20%2041,324L-f1e05a.svg) ![](https://img.shields.io/badge/%20%20CSS-%20%20%20%20937L-563d7c.svg) [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/aleen42/gitbook-comments/master/LICENSE) [![npm](https://img.shields.io/npm/dt/gitbook-plugin-comments-footer.svg)](https://www.npmjs.com/package/gitbook-plugin-comments-footer)
+![](https://img.shields.io/badge/%20%20JavaScript-%20%20%20%2041,538L-f1e05a.svg) ![](https://img.shields.io/badge/%20%20CSS-%20%20%20%20961L-563d7c.svg) [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/aleen42/gitbook-comments/master/LICENSE) [![npm](https://img.shields.io/npm/dt/gitbook-plugin-comments-footer.svg)](https://www.npmjs.com/package/gitbook-plugin-comments-footer)
 
 ![comments-footer](./preview.png)
 
@@ -78,7 +78,7 @@ And then, the configuration option can be set as an object like the following sn
 ### TODO
 
 - [ ] Disable subscribing states when commenting on articles.
-- [ ] Discussion features on GitLab.
+- [x] Replying features on GitLab.
 - [x] ~~GitLab features depend on the functions around commit comments: https://gitlab.com/gitlab-org/gitlab-ce/issues/59798.~~ Use discussion instead.
 - [x] ~~GitLab private access token has no detailed scope for avoiding abusing by others.~~ It means that I cannot get discussions when users do not authorize themselves.
 
@@ -98,6 +98,7 @@ And then, the configuration option can be set as an object like the following sn
 	* 1.2.7 list all commits recursively
 	* 1.2.9 bug fix
 	* 1.3.0 more restrict regression for matching commit difference
+	* 1.3.1 support replying features in GitLab
 
 ### :fuelpump: How to contribute
 
