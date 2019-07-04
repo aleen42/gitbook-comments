@@ -25,7 +25,8 @@ const entry = () => {
     } : {}, params))}`;
 
     /** editor initialization wrapper */
-    const _initEditor = element => new SimpleMDE({
+    const _initEditor = (element, autofocus = false) => new SimpleMDE({
+        autofocus,
         element,
         status: false,
         placeholder: 'Write a comment here...',
@@ -51,6 +52,7 @@ const entry = () => {
     /** comment data handler */
     const _handleCommentData = ({
         github: (comment, currentUserId, replace = true) => ({
+            type: 'github',
             id: comment['id'],
             author: {
                 avatar: comment.user['avatar_url'],
@@ -66,6 +68,7 @@ const entry = () => {
             owner: comment.user['id'] === currentUserId,
         }),
         gitlab: (comment, currentUserId, replace = true) => ({
+            type: 'gitlab',
             id: comment['id'],
             author: {
                 avatar: comment.author['avatar_url'],
@@ -121,10 +124,10 @@ const entry = () => {
                             : [_url(urls['repo.comments'])]).map((url, index) => {
                                 const dfd = $.Deferred();
                                 $.get(url).done(result => {
-                                    dfd.resolve(isGitLab ? result.map((({id, notes}) => Object.assign(notes[0], {
+                                    dfd.resolve(isGitLab ? result.map((({id, notes}) => notes.map(note => Object.assign(note, {
                                         discussionId: id,
                                         commitId: commits[index].id,
-                                    }))) : result);
+                                    })))) : result);
                                 });
                                 return dfd.promise();
                             })
@@ -132,9 +135,10 @@ const entry = () => {
                             comments = [].concat(...comments);
 
                             if (isGitLab) {
+                                /** [[note1, note2], note, ...] */
                                 $.get(_url(urls['commit.diff'](commits[commits.length - 1]))).done(diffs => diffs.forEach(({new_path, diff}) => {
                                     new_path === SYS_CONST.path && deferred.resolve(
-                                        comments.filter(comment => (comment.position && comment.position['new_path'] || '') === SYS_CONST.path)
+                                        comments.map(comment => comment.filter(c => (c.position && c.position['new_path'] || '') === SYS_CONST.path)).filter(comment => comment.length)
                                         , Object.assign(commits[commits.length - 1], {
                                             diff: Object.assign(diff, {
                                                 /** @@ -48,4 +48,6 @@ */
@@ -150,7 +154,8 @@ const entry = () => {
                                     );
                                 }));
                             } else {
-                                deferred.resolve(comments.filter(({path}) => (path || '') === SYS_CONST.path), commits[commits.length - 1]);
+                                /** [[comment], [comment], ...] */
+                                deferred.resolve(comments.filter(({path}) => (path || '') === SYS_CONST.path), commits[commits.length - 1].map(comment => [].concat(comment)));
                             }
                         });
                     }
@@ -162,15 +167,19 @@ const entry = () => {
 
         _getComments().then((comments, latestCommit) => {
             $contentLoading.hide();
+            /** [[comment], [comment], ...] */
             $contentWrapper.find('.comment-list .empty-comments')
-                .replaceWith(Handlebars.compile(commentTpl)(comments.map(comment => _handleCommentData(comment, uid))));
+                .replaceWith(Handlebars.compile(commentTpl)(comments.map(comment => comment.map(c => _handleCommentData(c, uid)))));
 
-            uid && $contentWrapper.off('click').on('click', 'i[action]', function () {
+            uid && $contentWrapper.off('click').on('click', 'i[action],div[action]', function () {
                 let $loading;
                 let url;
 
                 const $item = $(this).closest('.comment-item');
-                const $noteItem = $item.find('.comment-note');
+                const $noteItem = $(this).closest('.note-item');
+                const $comment = $noteItem.find('.comment-note');
+                const $replyWrapper = $item.find('.reply-wrapper');
+
                 switch ($(this).attr('action')) {
                     case 'logout':
                         /** remove cookie */
@@ -183,59 +192,94 @@ const entry = () => {
                         $page.animate({scrollTop: $page[0].scrollTop + $('#comment-wrapper').offset().top - 50});
                         break;
                     case 'edit':
-                        url = isGitLab
-                            ? urls['comment'](void 0, $item.attr('commit-id'), $item.attr('discussion-id'))
-                            : urls['comment']($item.attr('comment-id'));
-
-                        if (url && !$noteItem.hasClass('editor')) {
-                            $noteItem.data('origin', $noteItem.html())
+                        if (!$comment.hasClass('editor')) {
+                            $comment.data('origin', $comment.html())
                                 .addClass('editor').html(Handlebars.compile(editorTpl)({modify: true}));
 
-                            const editor = _initEditor($noteItem.find('textarea')[0]);
-                            $noteItem.data('editor', editor);
-
-                            $loading = _loading($noteItem);
-                            $.get(_url(url)).done(comment => {
-                                editor.value(_handleCommentData(isGitLab ? Object.assign(comment.notes[0], {
-                                    commitId: $item.attr('commit-id'),
-                                    discussionId: $item.attr('discussion-id'),
-                                }) : comment, uid, false).content);
-                                $loading.hide();
-                            });
+                            const editor = _initEditor($comment.find('textarea')[0], true);
+                            $comment.data('editor', editor);
+                            editor.value(JSON.parse($comment.data('content')));
                         }
                         break;
-                    case 'modify':
-                        url = urls['comment']($item.attr('comment-id'), $item.attr('commit-id'), $item.attr('discussion-id'));
+                    case 'doEdit':
+                        url = urls['comment']($noteItem.attr('comment-id'), $item.attr('commit-id'), $item.attr('discussion-id'));
                         if (url) {
-                            $loading = _loading($noteItem);
+                            $loading = _loading($comment);
                             $.ajax({
                                 url: _url(url),
                                 type: isGitLab ? 'PUT' : 'PATCH',
                                 data: JSON.stringify({
-                                    body: `${$noteItem.data('editor').value()}\n\n—\n\n[View it on GitBook](${location.href.replace(/#.*$/gi, '')}#comment-wrapper)`,
+                                    body: `${$comment.data('editor').value()}\n\n—\n\n[View it on GitBook](${location.href.replace(/#.*$/gi, '')}#comment-wrapper)`,
                                 }),
                                 dataType: 'json',
                                 processData: false,
                                 contentType: 'application/json; charset=utf-8',
                             },).done(comment => {
-                                $item.replaceWith($(Handlebars.compile(commentTpl)([_handleCommentData(isGitLab ? Object.assign(comment, {
+                                $noteItem.replaceWith($(Handlebars.compile(commentTpl)([[_handleCommentData(isGitLab ? Object.assign(comment, {
                                     commitId: $item.attr('commit-id'),
                                     discussionId: $item.attr('discussion-id'),
-                                }) : comment, uid)])));
+                                }) : comment, uid)]])).find('.note-item'));
                             });
                         }
                         break;
-                    case 'cancel':
-                        $noteItem.html($noteItem.data('origin')).removeClass('editor');
+                    case 'cancelEdit':
+                        $comment.html($comment.data('origin')).removeClass('editor');
+                        break;
+                    case 'reply':
+                        $replyWrapper.html(Handlebars.compile(editorTpl)({reply: true}));
+                        $replyWrapper.data('editor', _initEditor($replyWrapper.find('textarea')[0], true));
+                        break;
+                    case 'doReply':
+                        url = urls['comment'](void 0, $item.attr('commit-id'), $item.attr('discussion-id'));
+                        if (url) {
+                            $loading = _loading($replyWrapper);
+                            $.ajax({
+                                url: _url(url),
+                                type: 'POST',
+                                data: JSON.stringify({
+                                    body: `${$replyWrapper.data('editor').value()}\n\n—\n\n[View it on GitBook](${location.href.replace(/#.*$/gi, '')}#comment-wrapper)`,
+                                }),
+                                dataType: 'json',
+                                processData: false,
+                                contentType: 'application/json; charset=utf-8',
+                            },).done(comment => {
+                                const $note = $(`
+                                    <div class="slider"></div>
+                                    ${$(Handlebars.compile(commentTpl)([[_handleCommentData(isGitLab ? Object.assign(comment, {
+                                        commitId: $item.attr('commit-id'),
+                                        discussionId: $item.attr('discussion-id'),
+                                    }) : comment, uid)]])).find('.note-item').prop('outerHTML')}
+                                `);
+
+                                $note.hide().insertBefore($replyWrapper.prev());
+                                $note.fadeIn();
+                                $loading.hide();
+                                $replyWrapper.html('<div class="reply" title="Add a reply" action="reply">Reply...</div>');
+                            });
+                        }
+                        console.log(url);
+                        break;
+                    case 'cancelReply':
+                        $replyWrapper.html('<div class="reply" title="Add a reply" action="reply">Reply...</div>');
                         break;
                     case 'remove':
-                        url = urls['comment']($item.attr('comment-id'), $item.attr('commit-id'), $item.attr('discussion-id'));
+                        url = urls['comment']($noteItem.attr('comment-id'), $item.attr('commit-id'), $item.attr('discussion-id'));
                         if (url && window.confirm('Are you sure you want to delete this?')) {
                             $loading = _loading($content);
                             $.ajax({url: _url(url), type: 'DELETE'}).done(() => {
-                                $content.find('.comment-item:visible').length === 1
-                                    ? $item.replaceWith(Handlebars.compile(commentTpl)([]))
-                                    : $item.fadeOut();
+                                if ($item.find('.note-item:visible').length === 1) {
+                                    // empty note-item
+                                    $item.fadeOut();
+
+                                    if ($content.find('.comment-item:visible').length === 1) {
+                                        // empty comment-item
+                                        $item.replaceWith(Handlebars.compile(commentTpl)([]));
+                                    }
+                                } else {
+                                    $noteItem.prev('.slider').length ? $noteItem.prev('.slider').fadeOut() : $noteItem.next('.slider').fadeOut();
+                                    $noteItem.fadeOut();
+                                }
+
                                 $loading.hide();
                             });
                         }
@@ -243,7 +287,7 @@ const entry = () => {
                     case 'send':
                         url = urls['leave.comment'](latestCommit);
                         if (url) {
-                            $loading = _loading($contentWrapper.find('.editor'));
+                            $loading = _loading($editorWrapper.find('.editor'));
                             $.ajax({
                                 url: _url(url),
                                 type: 'POST',
@@ -267,10 +311,10 @@ const entry = () => {
                                 contentType: 'application/json; charset=utf-8',
                             },).done(comment => {
                                 const $emptyItem = $content.find('.empty-comments');
-                                const $item = $(Handlebars.compile(commentTpl)([_handleCommentData(isGitLab ? Object.assign(comment.notes[0], {
+                                const $item = $(Handlebars.compile(commentTpl)([[_handleCommentData(isGitLab ? Object.assign(comment.notes[0], {
                                     commitId: latestCommit.id,
                                     discussionId: comment.id,
-                                }) : comment, uid)]));
+                                }) : comment, uid)]]));
 
                                 $emptyItem.length ? $emptyItem.replaceWith($item.hide()) : $item.hide().appendTo($content);
                                 $item.fadeIn();
@@ -291,7 +335,7 @@ const entry = () => {
         $editorWrapper.show();
 
         /** init editor */
-        const $editor = $contentWrapper.find('.editor');
+        const $editor = $editorWrapper.find('.editor');
         $editor.html(Handlebars.compile(editorTpl)({send: true}));
         const editor = _initEditor($editor.find('.editor textarea')[0]);
 

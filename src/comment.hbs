@@ -1,29 +1,41 @@
 {{#if this.length}}
     {{#each this}}
-        <div class="comment-item clearfix" comment-id="{{id}}" commit-id="{{commitId}}" discussion-id="{{discussionId}}">
-            <a href="{{author.info}}" target="_blank"><img src="{{author.avatar}}" class="user-avatar {{#unless active}}disabled{{/unless}}"
-                                                           alt="gitlab-comment-avatar"/></a>
-            <div class="comment-note">{{{markedown content}}}</div>
-            <p class="comment-description">
-                <span class="name">{{author.name}}</span>
-                <span class="username"><a href="{{author.info}}" target="_blank">@{{author.username}}</a></span>
-                <span class="comment-footer">
-                    · commented
-                    {{#if updated_at}}
-                        <a href="#" title="{{moment updated_at}}">{{moment updated_at 'fromNow'}}</a>
-                    {{else}}
-                        {{#if created_at}}
-                            <a href="#" title="{{moment created_at}}">{{moment created_at 'fromNow'}}</a>
+        <div class="comment-item clearfix" commit-id="{{this.0.commitId}}" discussion-id="{{this.0.discussionId}}">
+            {{#each this}}
+                {{#compare @index '>' 0}}
+                    <div class="slider"></div>
+                {{/compare}}
+                <div class="note-item clearfix" comment-id="{{id}}">
+                    <a href="{{author.info}}" target="_blank"><img src="{{author.avatar}}" class="user-avatar {{#unless active}}disabled{{/unless}}"
+                                                                   alt="gitlab-comment-avatar"/></a>
+                    <div class="comment-note" data-content="{{stringify content}}">{{{markedown content}}}</div>
+                    <p class="comment-description">
+                        <span class="name">{{author.name}}</span>
+                        <span class="username"><a href="{{author.info}}" target="_blank">@{{author.username}}</a></span>
+                        <span class="comment-footer">· commented
+                            {{#if updated_at}}
+                                <a href="#" title="{{moment updated_at}}">{{moment updated_at 'fromNow'}}</a>
+                            {{else}}
+                                {{#if created_at}}
+                                    <a href="#" title="{{moment created_at}}">{{moment created_at 'fromNow'}}</a>
+                                {{/if}}
+                            {{/if}}
+                        </span>
+                        {{#if owner}}
+                            <span class="comment-operations">
+                                <i class="fa fa-pencil-square-o" title="edit" action="edit"></i>
+                                <i class="fa fa-trash-o" title="remove" action="remove"></i>
+                            </span>
                         {{/if}}
-                    {{/if}}
-                </span>
-                {{#if owner}}
-                <span class="comment-operations">
-                        <i class="fa fa-pencil-square-o" title="edit" action="edit"></i>
-                        <i class="fa fa-trash-o" title="remove" action="remove"></i>
-                </span>
-                {{/if}}
-            </p>
+                    </p>
+                </div>
+            {{/each}}
+            {{#compare this.0.type '===' 'gitlab'}}
+                <div class="slider"></div>
+                <div class="reply-wrapper editor">
+                    <div class="reply" title="Add a reply" action="reply">Reply...</div>
+                </div>
+            {{/compare}}
         </div>
     {{/each}}
 {{else}}

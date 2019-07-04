@@ -25,7 +25,7 @@ const urls = {
         'commit.diff': ({id}) => `${SYS_CONST.host}/api/v4/projects/${encodeURIComponent(SYS_CONST.repo)}/repository/commits/${id}/diff`,
         'commit.comments': ({id}) => `${SYS_CONST.host}/api/v4/projects/${encodeURIComponent(SYS_CONST.repo)}/repository/commits/${id}/discussions`,
         'leave.comment': ({id}) => `${SYS_CONST.host}/api/v4/projects/${encodeURIComponent(SYS_CONST.repo)}/repository/commits/${id}/discussions`,
-        'comment': (id, commitId, discussionId) => `${SYS_CONST.host}/api/v4/projects/${encodeURIComponent(SYS_CONST.repo)}/repository/commits/${commitId}/discussions/${discussionId}${id ? `/notes/${id}` : ''}`,
+        'comment': (id, commitId, discussionId) => `${SYS_CONST.host}/api/v4/projects/${encodeURIComponent(SYS_CONST.repo)}/repository/commits/${commitId}/discussions/${discussionId}${id ? `/notes/${id}` : '/notes'}`,
     },
 };
 

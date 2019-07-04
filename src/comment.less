@@ -179,7 +179,7 @@
 
         .CodeMirror {
             border: 1px solid #ccc;
-            height: 200px;
+            height: 300px;
             background-color: #fff;
 
             pre.CodeMirror-line {
@@ -271,6 +271,34 @@
             border-radius: 4px;
             border: 1px solid #ccc;
             margin-bottom: 10px;
+
+            .slider {
+                margin: 20px auto;
+                height: 1px;
+                width: 80%;
+                background-color: #efefef;
+            }
+
+            .reply-wrapper {
+                width: 100%;
+            }
+
+            .reply {
+                width: 100%;
+                height: 32px;
+                text-align: left;
+                padding: 6px 16px;
+                border-color: #e5e5e5;
+                color: #c4c4c4;
+                background-color: #fafafa;
+                border-radius: 4px;
+                user-select: none;
+                cursor: pointer;
+            }
+
+            .CodeMirror {
+                height: 200px;
+            }
 
             &.empty-comments {
                 text-align: center;

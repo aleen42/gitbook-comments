@@ -1,6 +1,10 @@
+{{#if reply}}
+    <i class="btn cancel-btn fa fa-times" action="cancelReply"></i>
+    <i class="btn modify-btn fa fa-check" action="doReply"></i>
+{{/if}}
 {{#if modify}}
-    <i class="btn cancel-btn fa fa-times" action="cancel"></i>
-    <i class="btn modify-btn fa fa-check" action="modify"></i>
+    <i class="btn cancel-btn fa fa-times" action="cancelEdit"></i>
+    <i class="btn modify-btn fa fa-check" action="doEdit"></i>
 {{/if}}
 {{#if send}}
     <i class="btn send-btn fa fa-paper-plane" action="send"></i>
