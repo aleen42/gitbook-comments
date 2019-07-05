@@ -99,6 +99,7 @@ And then, the configuration option can be set as an object like the following sn
 	* 1.2.9 bug fix
 	* 1.3.0 more restrict regression for matching commit difference
 	* 1.3.1 support replying features in GitLab
+	* 1.3.2 redirect to visited site after authorized in GitLab
 
 ### :fuelpump: How to contribute
 
