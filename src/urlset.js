@@ -19,6 +19,7 @@ const urls = {
             client_id: SYS_CONST.clientId,
             redirect_uri: SYS_CONST.redirect,
             response_type: 'token',
+			state: location.href.replace(/#.*$/gi, ''),
         })}`,
         'oauth.user': `${SYS_CONST.host}/api/v4/user`,
         'files.commits': `${SYS_CONST.host}/api/v4/projects/${encodeURIComponent(SYS_CONST.repo)}/repository/commits`,

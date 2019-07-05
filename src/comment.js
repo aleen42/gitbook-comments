@@ -377,9 +377,8 @@ const entry = () => {
     if (hash['access_token']) {
         /** update cookie */
         Cookie.set('comment.access_token', hash['access_token']);
-        _run(hash['access_token']);
         /** scroll to content wrapper */
-        location.href = `${location.href.replace(/#.*$/gi, '')}#comment-wrapper`;
+        location.href = `${hash['state'] ? decodeURIComponent(hash['state']) : location.href.replace(/#.*$/gi, '')}#comment-wrapper`;
     } else if ((accessToken = Cookie.get('comment.access_token'))) {
         _run(accessToken);
     } else {
