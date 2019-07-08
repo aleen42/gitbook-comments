@@ -135,7 +135,7 @@ const entry = () => {
                             comments = [].concat(...comments);
 
                             if (isGitLab) {
-                                /** [[note1, note2], note, ...] */
+                                /** resolve [[note1, note2], note, ...] */
                                 $.get(_url(urls['commit.diff'](commits[commits.length - 1]))).done(diffs => diffs.forEach(({new_path, diff}) => {
                                     new_path === SYS_CONST.path && deferred.resolve(
                                         comments.map(comment => comment.filter(c => (c.position && c.position['new_path'] || '') === SYS_CONST.path)).filter(comment => comment.length)
@@ -154,8 +154,8 @@ const entry = () => {
                                     );
                                 }));
                             } else {
-                                /** [[comment], [comment], ...] */
-                                deferred.resolve(comments.filter(({path}) => (path || '') === SYS_CONST.path), commits[commits.length - 1].map(comment => [].concat(comment)));
+                                /** resolve [[comment], [comment], ...] */
+                                deferred.resolve(comments.filter(({path}) => (path || '') === SYS_CONST.path).map(comment => [].concat(comment)), commits[commits.length - 1]);
                             }
                         });
                     }
