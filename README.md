@@ -101,6 +101,7 @@ And then, the configuration option can be set as an object like the following sn
 	* 1.3.1 support replying features in GitLab
 	* 1.3.2 redirect to visited site after authorized in GitLab
 	* 1.3.3 fix NPE problem
+	* 1.3.5 autocomplete feature within GitLab and fix a bug
 
 ### :fuelpump: How to contribute
 
