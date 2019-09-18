@@ -476,9 +476,10 @@ const entry = () => {
     };
 
     let accessToken;
-    if (hash['access_token']) {
+    if ((accessToken = hash['access_token'])) {
         /** update cookie */
-        Cookie.set('comment.access_token', hash['access_token']);
+        Cookie.set('comment.access_token', accessToken);
+        _run(accessToken);
         /** scroll to content wrapper */
         location.href = `${hash['state'] ? decodeURIComponent(hash['state']) : location.href.replace(/#.*$/gi, '')}#comment-wrapper`;
     } else if ((accessToken = Cookie.get('comment.access_token'))) {
