@@ -13,6 +13,9 @@ const urls = require('./urlset').of(SYS_CONST.type);
 const isGitLab = SYS_CONST.type === 'gitlab';
 
 const entry = () => {
+    /** all users data */
+    let users = [];
+
     const $contentWrapper = $('.content-wrapper');
 
     const $commentWrapper = $contentWrapper.find('.comment-wrapper');
@@ -25,13 +28,95 @@ const entry = () => {
     } : {}, params))}`;
 
     /** editor initialization wrapper */
-    const _initEditor = (element, autofocus = false) => new SimpleMDE({
-        autofocus,
-        element,
-        status: false,
-        placeholder: 'Write a comment here...',
-        hideIcons: ['guide'],
-    });
+    const _initEditor = (element, autofocus = false) => {
+        const editor = new SimpleMDE({
+            autofocus,
+            element,
+            status: false,
+            placeholder: 'Write a comment here...',
+            hideIcons: ['guide'],
+        });
+
+        /** init user auto matching */
+        let $hook;
+        const mirror = editor.codemirror;
+        const doc = mirror.doc;
+        const _destroyHint = () => {
+            /** clear */
+            $hook && $hook.remove();
+            $hook = null;
+        };
+
+        const _append = $target => {
+            const {line, ch} = doc.getCursor();
+            const beforeContent = doc.getRange({line: 0, ch: 0}, {line, ch});
+            const name = $target.data('name');
+            doc.replaceRange(`@${name} `, {line, ch: ch - beforeContent.length + beforeContent.lastIndexOf('@')}, {line, ch});
+            mirror.focus();
+            mirror.doc.setCursor(line, ch + `@${name} `.length - `@${/(?:\s|^)@(\w*)$/.exec(beforeContent)[1]}`.length);
+        };
+
+        const _handleHint = () => {
+            const {line, ch} = doc.getCursor();
+            let input;
+            if (!(input = /(?:\s|^)@(\w*)$/.exec(doc.getRange({line: 0, ch: 0}, {line, ch})))) return _destroyHint();
+            /** calculate position in a next event loop */
+            setTimeout(() => {
+                /** insert hook */
+                !$hook && $(window.getSelection().focusNode).closest('.CodeMirror').before($hook = $('<div class="auto-hint"><ul></ul></div>'));
+                $hook.css({
+                    left: `${$hook.next().children().first().position().left - 10}px`,
+                    top: `${$hook.next().children().first().position().top + 70}px`,
+                }).find('ul')
+                    .html(users.filter(({username}, index) => !input[1]
+                        ? index < 20
+                        : username.indexOf(input[1]) > -1)
+                        .map(({username, name, avatar_url}) => `<li data-name="${username}">
+                            <img src="${avatar_url}" class="user-avatar" />
+                            <span class="username">${username}</span>
+                            <span class="name">${name}</span>
+                        </li>`)).off('click').on('click', 'li', function () {
+                            _append($(this));
+                            return false;
+                        });
+            });
+        };
+
+        mirror.on('keydown', (instance, e) => {
+            const code = e.keyCode || e.which;
+            if ([/* up = */38, /* down = */40, /* enter = */13, /* esc = */27].includes(code)) {
+                if (!$hook) return;
+                _stop(e);
+                /** esc */
+                if (code === 27) return _destroyHint();
+
+                const $ul = $hook.find('ul');
+                const $active = $ul.find('li.active');
+                /** enter */
+                if (code === 13) return _append($active.length ? $active : $ul.find('li').first());
+                /** up or down */
+                if (!$active.length) return $ul.find('li').first().addClass('active');
+                let $target = $active[code === 38 ? 'prev' : 'next']();
+                /** select first or last */
+                !$target.length && ($target = $ul.find('li')[code === 38 ? 'last' : 'first']());
+                $active.removeClass('active');
+                $target.addClass('active');
+                /** scroll to outside item */
+                $hook.prop('scrollTop', (index, val) => {
+                    const [up, down] = [
+                        $target.offset().top - $ul.offset().top,
+                        $target.offset().top - $ul.offset().top + $target.outerHeight() - $hook.outerHeight(),
+                    ];
+                    return val < down ? down : val > up ? up : val;
+                });
+            }
+        });
+        mirror.on('blur', () => setTimeout(_destroyHint, 200)); /** wait for appending */
+        mirror.on('focus', _handleHint);
+        mirror.on('change', _handleHint);
+        mirror.on('cursorActivity', _handleHint);
+        return editor;
+    };
 
     /** loading wrapper */
     const _loading = $wrapper => {
@@ -330,23 +415,40 @@ const entry = () => {
     };
 
     const _showEditor = token => {
+        const deferred = $.Deferred();
         const _url = _wrapUrl(token);
 
-        $editorWrapper.show();
+        /** init users searching */
+        let _listUsers;
+        (_listUsers = (pageNum) => {
+            $.get(_url(urls['users'], {
+                page: pageNum,
+                'per_page': 100,
+            })).done(data => {
+                if (data.length) {
+                    users = [...users, ...data];
+                    _listUsers(++pageNum);
+                } else {
+                    $editorWrapper.show();
 
-        /** init editor */
-        const $editor = $editorWrapper.find('.editor');
-        $editor.html(Handlebars.compile(editorTpl)({send: true}));
-        const editor = _initEditor($editor.find('.editor textarea')[0]);
+                    /** init editor */
+                    const $editor = $editorWrapper.find('.editor');
+                    $editor.html(Handlebars.compile(editorTpl)({send: true}));
+                    const editor = _initEditor($editor.find('.editor textarea')[0]);
 
-        /** init the avatar of authenticated user */
-        return $.get(_url(urls['oauth.user'])).done(({id, avatar_url}) => {
-            $contentWrapper.find('.user-avatar').on('load', function () {
-                $(this).parent().css('display', 'inline-block');
-            }).attr('src', avatar_url);
+                    /** init the avatar of authenticated user */
+                    $.get(_url(urls['oauth.user'])).done(({id, avatar_url}) => {
+                        $contentWrapper.find('.user-avatar').on('load', function () {
+                            $(this).parent().css('display', 'inline-block');
+                        }).attr('src', avatar_url);
 
-            _showComment(token, id, editor);
-        });
+                        _showComment(token, id, editor);
+                    }).fail(deferred.reject);
+                }
+            }).fail(deferred.reject);
+        })(1);
+
+        return deferred.promise();
     };
 
     const _showAuth = () => {
@@ -389,3 +491,9 @@ const entry = () => {
 
 // noinspection JSUnresolvedVariable
 gitbook.events.bind('page.change', entry);
+
+/** helper */
+function _stop(e) {
+    e.preventDefault();
+    e.stopPropagation();
+}

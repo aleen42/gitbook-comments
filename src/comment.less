@@ -201,6 +201,65 @@
                 border-radius: 10px
             }
         }
+
+        .auto-hint {
+            position: absolute;
+            width: 180px;
+            max-height: 150px;
+            overflow-x: hidden;
+            overflow-y: auto;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            z-index: 5;
+            background-color: #fff;
+
+            &::-webkit-scrollbar {
+                width: 6px;
+                height: 6px;
+            }
+
+            &::-webkit-scrollbar-button {
+                display: none;
+            }
+
+            &::-webkit-scrollbar-thumb {
+                background-color: #000;
+                border-radius: 10px
+            }
+
+            ul {
+                list-style: none;
+                padding: 0;
+                margin: 0;
+                li {
+                    cursor: pointer;
+                    padding: 5px 10px;
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    &:hover{
+                        background-color: #efefef;
+                    }
+                    &.active {
+                        background-color: #efefef;
+                    }
+                    .user-avatar {
+                        border: 2px solid #fff;
+                        width: 25px;
+                        height: 25px;
+                        float: initial;
+                        vertical-align: middle;
+                        margin-right: 5px;
+                    }
+                    .username {
+                        color: #999;
+                    }
+                    .name {
+                        font-weight: bold;
+                    }
+                }
+            }
+        }
     }
 
     div.loading-item {
