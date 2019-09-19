@@ -37,6 +37,8 @@ const entry = () => {
             hideIcons: ['guide'],
         });
 
+        /** return editor directly when there is no data of users */
+        if (!users.length) return editor;
         /** init user auto matching */
         let $hook;
         const mirror = editor.codemirror;
@@ -418,10 +420,34 @@ const entry = () => {
         const deferred = $.Deferred();
         const _url = _wrapUrl(token);
 
+        const _doShow = () => {
+            $editorWrapper.show();
+
+            /** init editor */
+            const $editor = $editorWrapper.find('.editor');
+            $editor.html(Handlebars.compile(editorTpl)({send: true}));
+            const editor = _initEditor($editor.find('.editor textarea')[0]);
+
+            /** init the avatar of authenticated user */
+            $.get(_url(urls['oauth.user'])).done(({id, avatar_url}) => {
+                $contentWrapper.find('.user-avatar').on('load', function () {
+                    $(this).parent().css('display', 'inline-block');
+                }).attr('src', avatar_url);
+
+                _showComment(token, id, editor);
+            }).fail(deferred.reject);
+        };
+
         /** init users searching */
         let _listUsers;
+        const url = urls['users'];
+        if (!url) {
+            _doShow();
+            return deferred.promise();
+        }
+
         (_listUsers = (pageNum) => {
-            $.get(_url(urls['users'], {
+            $.get(_url(url, {
                 page: pageNum,
                 'per_page': 100,
             })).done(data => {
@@ -429,21 +455,7 @@ const entry = () => {
                     users = [...users, ...data];
                     _listUsers(++pageNum);
                 } else {
-                    $editorWrapper.show();
-
-                    /** init editor */
-                    const $editor = $editorWrapper.find('.editor');
-                    $editor.html(Handlebars.compile(editorTpl)({send: true}));
-                    const editor = _initEditor($editor.find('.editor textarea')[0]);
-
-                    /** init the avatar of authenticated user */
-                    $.get(_url(urls['oauth.user'])).done(({id, avatar_url}) => {
-                        $contentWrapper.find('.user-avatar').on('load', function () {
-                            $(this).parent().css('display', 'inline-block');
-                        }).attr('src', avatar_url);
-
-                        _showComment(token, id, editor);
-                    }).fail(deferred.reject);
+                    _doShow();
                 }
             }).fail(deferred.reject);
         })(1);
