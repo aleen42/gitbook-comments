@@ -37,8 +37,6 @@ const entry = () => {
             hideIcons: ['guide'],
         });
 
-        /** return editor directly when there is no data of users */
-        if (!users.length) return editor;
         /** init user auto matching */
         let $hook;
         const mirror = editor.codemirror;
@@ -59,6 +57,7 @@ const entry = () => {
         };
 
         const _handleHint = () => {
+            if (!users.length) return;
             const {line, ch} = doc.getCursor();
             let input;
             if (!(input = /(?:\s|^)@(\w*)$/.exec(doc.getRange({line: 0, ch: 0}, {line, ch})))) return _destroyHint();
@@ -76,7 +75,7 @@ const entry = () => {
                         .map(({username, name, avatar_url}) => `<li data-name="${username}">
                             <img src="${avatar_url}" class="user-avatar" />
                             <span class="username">${username}</span>
-                            <span class="name">${name}</span>
+                            ${name ? `<span class="name">${name}</span>` : ''}
                         </li>`)).off('click').on('click', 'li', function () {
                             _append($(this));
                             return false;
@@ -174,6 +173,33 @@ const entry = () => {
         }),
     })[SYS_CONST.type];
 
+    const _getRecursively = (url, onEmpty) => {
+        const deferred = $.Deferred();
+        let _recursive;
+        let result = [];
+
+        (_recursive = pageNum => {
+            $.get(url, {
+                page: pageNum,
+                'per_page': 100,
+            }).done(data => {
+                if (data.length) {
+                    result = [...result, ...data];
+                    _recursive(++pageNum);
+                } else {
+                    if (!result.length) {
+                        onEmpty ? onEmpty(deferred) : deferred.resolve(result);
+                        return;
+                    }
+
+                    deferred.resolve(result);
+                }
+            }).fail(deferred.reject);
+        })(1);
+
+        return deferred.promise();
+    };
+
     const _showComment = (token, uid, editor) => {
         const _url = _wrapUrl(token);
 
@@ -186,68 +212,66 @@ const entry = () => {
         const _getComments = () => {
             const deferred = $.Deferred();
 
-            let _listCommits;
-            let commits = [];
-
-            (_listCommits = (pageNum, all = true) => {
-                $.get(_url(urls['files.commits'], {
+            _getRecursively(_url(urls['files.commits'], {
+                path: SYS_CONST.path,
+                all: true,
+            }), deferred => {
+                /** sometimes the commit may lose when searching all commits */
+                _getRecursively(_url(urls['files.commits'], {
                     path: SYS_CONST.path,
-                    page: pageNum,
-                    'per_page': 100,
-                    all,
-                })).done(data => {
-                    if (data.length) {
-                        commits = [...commits, ...data];
-                        _listCommits(++pageNum);
-                    } else {
-                        if (!commits.length) {
-                            /** sometimes the commit may lose when searching all commits */
-                            all && _listCommits(1, false);
-                            return;
-                        }
-
-                        $.when.apply($, (isGitLab
-                            ? commits.map(commit => _url(urls['commit.comments'](commit)))
-                            : [_url(urls['repo.comments'])]).map((url, index) => {
-                                const dfd = $.Deferred();
-                                $.get(url).done(result => {
-                                    dfd.resolve(isGitLab ? result.map((({id, notes}) => notes.map(note => Object.assign(note, {
-                                        discussionId: id,
-                                        commitId: commits[index].id,
-                                    })))) : result);
-                                });
-                                return dfd.promise();
-                            })
-                        ).done((...comments) => {
-                            comments = [].concat(...comments);
-
-                            if (isGitLab) {
-                                /** resolve [[note1, note2], note, ...] */
-                                $.get(_url(urls['commit.diff'](commits[commits.length - 1]))).done(diffs => diffs.forEach(({new_path, diff}) => {
-                                    new_path === SYS_CONST.path && deferred.resolve(
-                                        comments.map(comment => comment.filter(c => (c.position && c.position['new_path'] || '') === SYS_CONST.path)).filter(comment => comment.length)
-                                        , Object.assign(commits[commits.length - 1], {
-                                            diff: Object.assign(diff, {
-                                                /** @@ -48,4 +48,6 @@ */
-                                                /** @@ -0,0 +1,48 @@ */
-                                                oldLine: diff.match(/@@\s-(.*?)\s\+.*?\s@@/i)[1]
-                                                    .split(',')
-                                                    .reduce((line, i) => line + parseInt(i, 10), 0) - 1,
-                                                newLine: diff.match(/@@\s-.*?\s\+(.*?)\s@@/i)[1]
-                                                    .split(',')
-                                                    .reduce((line, i) => line + parseInt(i, 10), 0) - 1
-                                            }),
-                                        })
-                                    );
-                                }));
-                            } else {
-                                /** resolve [[comment], [comment], ...] */
-                                deferred.resolve(comments.filter(({path}) => (path || '') === SYS_CONST.path).map(comment => [].concat(comment)), commits[commits.length - 1]);
-                            }
+                    all: false,
+                })).then(result => deferred.resolve(result));
+            }).then(commits => {
+                $.when.apply($, (isGitLab
+                    ? commits.map(commit => _url(urls['commit.comments'](commit)))
+                    : [_url(urls['repo.comments'])]).map((url, index) => {
+                        const dfd = $.Deferred();
+                        _getRecursively(url).then(result => {
+                            dfd.resolve(isGitLab ? result.map((({id, notes}) => notes.map(note => Object.assign(note, {
+                                discussionId: id,
+                                commitId: commits[index].id,
+                            })))) : result);
                         });
+                        return dfd.promise();
+                    })
+                ).done((...comments) => {
+                    comments = [].concat(...comments);
+
+                    if (isGitLab) {
+                        /** resolve [[note1, note2], note, ...] */
+                        $.get(_url(urls['commit.diff'](commits[commits.length - 1]))).done(diffs => diffs.forEach(({new_path, diff}) => {
+                            new_path === SYS_CONST.path && deferred.resolve(
+                                comments.map(comment => comment.filter(c => (c.position && c.position['new_path'] || '') === SYS_CONST.path)).filter(comment => comment.length)
+                                , Object.assign(commits[commits.length - 1], {
+                                    diff: Object.assign(diff, {
+                                        /** @@ -48,4 +48,6 @@ */
+                                        /** @@ -0,0 +1,48 @@ */
+                                        oldLine: diff.match(/@@\s-(.*?)\s\+.*?\s@@/i)[1]
+                                            .split(',')
+                                            .reduce((line, i) => line + parseInt(i, 10), 0) - 1,
+                                        newLine: diff.match(/@@\s-.*?\s\+(.*?)\s@@/i)[1]
+                                            .split(',')
+                                            .reduce((line, i) => line + parseInt(i, 10), 0) - 1
+                                    }),
+                                })
+                            );
+                        }));
+                    } else {
+                        /** resolve [[comment], [comment], ...] */
+                        deferred.resolve(comments.filter(({path}) => (path || '') === SYS_CONST.path).map(comment => {
+                            /** init users who have leaved comments in this repo within GitHub */
+                            const user = comment.user;
+                            users.findIndex(({id}) => id === user.id) === -1 && (users = [...users, {
+                                id: user.id,
+                                username: user.login,
+                                avatar_url: user.avatar_url,
+                            }]);
+                            /** construct comment */
+                            return [].concat(comment);
+                        }), commits[commits.length - 1]);
                     }
-                })
-            })(1);
+                });
+            });
 
             return deferred.promise();
         };
@@ -419,8 +443,10 @@ const entry = () => {
     const _showEditor = token => {
         const deferred = $.Deferred();
         const _url = _wrapUrl(token);
-
-        const _doShow = () => {
+        /** init users searching */
+        const url = urls['users'];
+        (!url ? $.Deferred().resolve([]) : _getRecursively(_url(url))).then(result => {
+            users = result;
             $editorWrapper.show();
 
             /** init editor */
@@ -436,30 +462,7 @@ const entry = () => {
 
                 _showComment(token, id, editor);
             }).fail(deferred.reject);
-        };
-
-        /** init users searching */
-        let _listUsers;
-        const url = urls['users'];
-        if (!url) {
-            _doShow();
-            return deferred.promise();
-        }
-
-        (_listUsers = (pageNum) => {
-            $.get(_url(url, {
-                page: pageNum,
-                'per_page': 100,
-            })).done(data => {
-                if (data.length) {
-                    users = [...users, ...data];
-                    _listUsers(++pageNum);
-                } else {
-                    _doShow();
-                }
-            }).fail(deferred.reject);
-        })(1);
-
+        }).fail(deferred.reject);
         return deferred.promise();
     };
 
