@@ -27,7 +27,7 @@
     "url": "https://github.com/aleen42/gitbook-comments/issues"
   },
   "dependencies": {
-    "handlebars": "4.1.1",
+    "handlebars": "4.5.1",
     "marked": "0.6.1",
     "moment": "2.24.0",
     "simplemde": "1.11.2"
