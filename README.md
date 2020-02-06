@@ -105,6 +105,7 @@ And then, the configuration option can be set as an object like the following sn
 	* 1.3.7 unified font sizes
 	* 1.3.8 compatible autocomplete for GitHub
 	* 1.3.9 feature autocomplete for GitHub
+	* 1.4.2 deprecated token access way for GitHub
 
 ### :fuelpump: How to contribute
 
