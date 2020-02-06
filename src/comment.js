@@ -23,9 +23,12 @@ const entry = () => {
     const $authWrapper = $contentWrapper.find('.auth-wrapper');
 
     /** url wrapper */
-    const _wrapUrl = access_token => (url, params) => `${url}?${$.param(Object.assign(access_token ? {
-        access_token,
-    } : {}, params))}`;
+    const _wrapUrl = access_token => (url, params) => {
+        $.ajaxSetup({
+            headers: {'Authorization': access_token ? `token ${access_token}` : ''},
+        });
+        return `${url}?${$.param(params)}`
+    };
 
     /** editor initialization wrapper */
     const _initEditor = (element, autofocus = false) => {
