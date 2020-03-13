@@ -107,6 +107,12 @@ And then, the configuration option can be set as an object like the following sn
 	* 1.3.9 feature autocomplete for GitHub
 	* 1.4.2 deprecated token access way for GitHub
 
+### Q&A
+
+1. Why does requests towards GitLab API fails the policy of CORS? [#4](https://github.com/aleen42/gitbook-comments/issues/4)
+
+    > I have tested under **CE 11.7.5** and GitLab has already default set `Access-Control-Allow-Origin: *` for all requests of `api/*` under a `GET` way. If not for your environment, try to find a way to configure it.
+
 ### :fuelpump: How to contribute
 
 Have an idea? Found a bug? See [how to contribute](https://aleen42.github.io/PersonalWiki/contribution.html).
