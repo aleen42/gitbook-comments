@@ -85,7 +85,7 @@ And then, the configuration option can be set as an object like the following sn
 ### Release History
 
 * ==================== **1.0.0 Initial release** ====================
-	* 1.1.2 oauth2 integration
+    * 1.1.2 oauth2 integration
 	* 1.1.3 initial structure for featuring GitHub
 	* 1.1.4 fix bug
 	* 1.1.5 enhancement for reducing authorizing redirecting
@@ -107,6 +107,7 @@ And then, the configuration option can be set as an object like the following sn
 	* 1.3.9 feature autocomplete for GitHub
 	* 1.4.2 deprecated token access way for GitHub
 	* 1.4.3 keep token in url queries for GitLab
+    * 1.4.4 audit vulnerable dependencies
 
 ### Q&A
 
