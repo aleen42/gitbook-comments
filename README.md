@@ -108,6 +108,7 @@ And then, the configuration option can be set as an object like the following sn
 	* 1.4.2 deprecated token access way for GitHub
 	* 1.4.3 keep token in url queries for GitLab
     * 1.4.5 audit vulnerable dependencies
+    * 1.4.7 avoid downloading font-awesome via using SimpleMDE
 
 ### Q&A
 
