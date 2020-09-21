@@ -44,6 +44,7 @@ const entry = () => {
             status: false,
             placeholder: 'Write a comment here...',
             hideIcons: ['guide'],
+            autoDownloadFontAwesome: false,
         });
 
         /** init user auto matching */
