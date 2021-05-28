@@ -2,7 +2,6 @@
 
 const urls = {
     github: {
-        'token': 'https://gitbook-comments.herokuapp.com/gitbook-comments/token',
         'oauth.redirect': () => `https://gitbook-comments.herokuapp.com/gitbook-comments/redirect?${$.param({
             redirect: location.href.replace(/#.*$/gi, ''),
             authorized: `${SYS_CONST.host}/login/oauth/authorize`,
@@ -19,7 +18,7 @@ const urls = {
             client_id: SYS_CONST.clientId,
             redirect_uri: SYS_CONST.redirect,
             response_type: 'token',
-			state: location.href.replace(/#.*$/gi, ''),
+            state: location.href.replace(/#.*$/gi, ''),
         })}`,
         'oauth.user': `${SYS_CONST.host}/api/v4/user`,
         'files.commits': `${SYS_CONST.host}/api/v4/projects/${encodeURIComponent(SYS_CONST.repo)}/repository/commits`,
@@ -27,7 +26,7 @@ const urls = {
         'commit.comments': ({id}) => `${SYS_CONST.host}/api/v4/projects/${encodeURIComponent(SYS_CONST.repo)}/repository/commits/${id}/discussions`,
         'leave.comment': ({id}) => `${SYS_CONST.host}/api/v4/projects/${encodeURIComponent(SYS_CONST.repo)}/repository/commits/${id}/discussions`,
         'comment': (id, commitId, discussionId) => `${SYS_CONST.host}/api/v4/projects/${encodeURIComponent(SYS_CONST.repo)}/repository/commits/${commitId}/discussions/${discussionId}${id ? `/notes/${id}` : '/notes'}`,
-		'users': `${SYS_CONST.host}/api/v4/users`,
+        'users': `${SYS_CONST.host}/api/v4/users`,
     },
 };
 

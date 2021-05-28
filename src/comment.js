@@ -481,7 +481,7 @@ const entry = () => {
             location.href = urls['oauth.redirect']();
         });
 
-        isGitLab ? $commentWrapper.hide() : $.post(urls['token']).done(({token}) => _showComment(SYS_CONST.token || token));
+        isGitLab ? $commentWrapper.hide() : _showComment(SYS_CONST.token);
     };
 
     const _parseParams = str => str.split('&').map(item => item.split('=')).reduce((obj, item) => {
