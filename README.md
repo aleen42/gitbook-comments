@@ -78,6 +78,7 @@ And then, the configuration option can be set as an object like the following sn
 ### TODO
 
 - [ ] Disable subscribing states when commenting on articles.
+- [ ] Heroku is UNSTABLE for GitHub authorization!
 - [x] Replying features on GitLab.
 - [x] ~~GitLab features depend on the functions around commit comments: https://gitlab.com/gitlab-org/gitlab-ce/issues/59798.~~ Use discussion instead.
 - [x] ~~GitLab private access token has no detailed scope for avoiding abusing by others.~~ It means that I cannot get discussions when users do not authorize themselves.
@@ -109,12 +110,13 @@ And then, the configuration option can be set as an object like the following sn
 	* 1.4.3 keep token in url queries for GitLab
     * 1.4.5 audit vulnerable dependencies
     * 1.4.7 avoid downloading font-awesome via using SimpleMDE
+    * 1.4.9 avoid exposing token via Heroku
 
 ### Q&A
 
 1. Why does requests towards GitLab API fails the policy of CORS? [#4](https://github.com/aleen42/gitbook-comments/issues/4)
 
-    > I have tested under **CE 11.7.5** and GitLab has already default set `Access-Control-Allow-Origin: *` for all requests of `api/*` under a `GET` way. If not for your environment, try to find a way to configure it.
+    > I have tested under **CE 11.7.5** and GitLab has already set `Access-Control-Allow-Origin: *` for all requests of `api/*` under a `GET` way by default. If not for your environment, try to find a way to configure it.
 
 ### :fuelpump: How to contribute
 
