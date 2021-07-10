@@ -71,7 +71,7 @@
 
 .comment-copyright {
     float: right;
-    border-bottom: 1px solid #ccc;
+    border-bottom: 1px solid var(--color-book-border, rgba(13, 17, 23, 0.2));
 
     .title {
         font-size: 20px;
@@ -159,17 +159,39 @@
             }
         }
 
+        .CodeMirror-selected {
+            background: #3390ff;
+        }
+
         .editor-toolbar {
-            border-top: 1px solid #ccc;
-            border-left: 1px solid #ccc;
-            border-right: 1px solid #ccc;
+            border-top: 1px solid var(--color-book-border, rgba(13, 17, 23, 0.2));
+            border-left: 1px solid var(--color-book-border, rgba(13, 17, 23, 0.2));
+            border-right: 1px solid var(--color-book-border, rgba(13, 17, 23, 0.2));
             opacity: 1;
 
+            &.fullscreen {
+                background: var(--color-bg-primary, #fff);
+
+                &:before, &:after {
+                    background: none;
+                }
+            }
+
             a.fa {
-                color: #000;
-                font-weight: bold;
+                color: var(--color-text-primary, #24292f);
                 font-size: 14px;
                 border: none;
+
+                &.active, &:hover {
+                    background: var(--color-text-primary, #24292f);
+                    border-color: #95a5a6;
+                    color: var(--color-bg-primary, #fff);
+                }
+            }
+
+            i.separator {
+                border-left: 1px solid var(--color-book-border, rgba(13, 17, 23, 0.2));
+                border-right: 1px solid var(--color-book-border, rgba(13, 17, 23, 0.2));
             }
         }
 
@@ -177,11 +199,23 @@
             opacity: 1;
         }
 
+        .CodeMirror-selected {
+            background: #3390ff;
+        }
+
+        span.CodeMirror-selectedtext {
+            color: #fff;
+        }
+
         .CodeMirror {
-            border: 1px solid #ccc;
+            border: 1px solid var(--color-book-border, rgba(13, 17, 23, 0.2));
             height: 300px;
-            background-color: #fff;
+            background-color: var(--color-bg-primary, #fff);
             font-size: 12px;
+
+            .CodeMirror-selected {
+                background: #3390ff;
+            }
 
             pre.CodeMirror-line {
                 background: initial !important;
@@ -264,7 +298,7 @@
     }
 
     div.loading-item {
-        background-color: rgba(255, 255, 255, 0.8);
+        background: var(--color-book-header-bg, rgba(255, 255, 255, 0.7));
         position: absolute;
         z-index: 2;
         width: 100%;
@@ -292,7 +326,7 @@
             width: 3px;
             display: inline-block;
             animation: stretchdelay 1.2s infinite ease-in-out;
-            background-color: #000;
+            background-color: var(--color-text-primary, #24292f);
         }
 
         @-webkit-keyframes stretchdelay {
@@ -321,7 +355,7 @@
     }
 
     .comment-list {
-        border-bottom: 1px solid #ccc;
+        border-bottom: 1px solid var(--color-book-border, rgba(13, 17, 23, 0.2));
         margin-bottom: 20px;
         position: relative;
         font-size: 14px;
@@ -329,7 +363,7 @@
         div.comment-item {
             padding: 10px 20px;
             border-radius: 4px;
-            border: 1px solid #ccc;
+            border: 1px solid var(--color-book-border, rgba(13, 17, 23, 0.2));
             margin-bottom: 10px;
 
             .slider {
@@ -436,31 +470,17 @@
         z-index: 3;
     }
 
-    &.color-theme-1 {
-        .CodeMirror,
-        .editor-preview,
-        .editor-preview-side {
-            background-color: #f3eacb;
-        }
-
-        .content-wrapper div.loading-item {
-            background-color: rgba(243, 234, 203, 0.8);
-        }
+    .CodeMirror,
+    .editor-preview,
+    .editor-preview-side {
+        background-color: var(--color-bg-primary, #fff);
     }
 
-    &.color-theme-2 {
-        .CodeMirror,
-        .editor-preview,
-        .editor-preview-side {
-            background-color: #1c1f2b;
-        }
+    .CodeMirror-cursor {
+        border-left: 1px solid var(--color-text-primary, #24292f);
+    }
 
-        .content-wrapper div.loading-item {
-            background-color: rgba(28, 31, 43, 0.8);
-
-            .loading > div {
-                background-color: #fff;
-            }
-        }
+    .editor-preview-side {
+        border: 1px solid var(--color-book-border, rgba(13, 17, 23, 0.2));
     }
 }
