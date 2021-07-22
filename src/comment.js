@@ -481,7 +481,11 @@ const entry = () => {
             location.href = urls['oauth.redirect']();
         });
 
-        isGitLab ? $commentWrapper.hide() : _showComment(SYS_CONST.token);
+        if (isGitLab) {
+            $commentWrapper.hide();
+        } else {
+            _showComment(gitbook.state.config.pluginsConfig['comments-footer'].token || __ENV_ACCESS_TOKEN__);
+        }
     };
 
     const _parseParams = str => str.split('&').map(item => item.split('=')).reduce((obj, item) => {
