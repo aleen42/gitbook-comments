@@ -1,6 +1,6 @@
 {
   "name": "gitbook-plugin-comments-footer",
-  "version": "1.5.2",
+  "version": "1.5.7",
   "description": "A repo focusing on comments integrated with code management providers like GitLab or GitHub.",
   "main": "./lib/index.js",
   "scripts": {
@@ -10,7 +10,7 @@
   },
   "engines": {
     "node": "10.x",
-    "gitbook": ">=3.0.0-pre.0"
+    "gitbook": ">=3.2.2"
   },
   "repository": {
     "type": "git",

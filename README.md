@@ -112,6 +112,10 @@ And then, the configuration option can be set as an object like the following sn
     * 1.4.7 avoid downloading font-awesome via using SimpleMDE
     * 1.4.9 avoid exposing token via Heroku
     * 1.5.2 use gitbook-color to support light or dark theme
+    * 1.5.7 fix some problems
+        * avoid empty token
+        * fix wrong z-index of book header
+        * base64 encode token to avoid detection of GitHub
 
 ### Q&A
 
