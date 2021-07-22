@@ -29,8 +29,8 @@ const entry = () => {
                 access_token,
             } : {}, params))}`
         } else {
-            $.ajaxSetup({
-                headers: {'Authorization': access_token ? `token ${access_token}` : ''},
+            access_token && $.ajaxSetup({
+                headers: {Authorization: `token ${access_token}`},
             });
             return `${url}?${$.param(params || {})}`
         }
