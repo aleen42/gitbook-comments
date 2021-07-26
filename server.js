@@ -30,7 +30,7 @@ app.get('/gitbook-comments/redirect', (req, res) => {
     res.redirect(301, `${authorized}?${[
         `client_id=${process.env['CLIENT_ID']}`,
         `redirect_url=${encodeURIComponent('https://gitbook-comments.herokuapp.com/gitbook-comments/auth')}`,
-        `state=${encodeURIComponent(JSON.stringify({redirect, type}))}`
+        `state=${encodeURIComponent(JSON.stringify({redirect, type}))}`,
     ].join('&')}`);
 });
 
@@ -42,16 +42,16 @@ app.get('/gitbook-comments/auth', (req, res) => {
 
     const {redirect, type} = JSON.parse(decodeURIComponent(state));
     switch (type) {
-        case 'github':
-            axios.post('https://github.com/login/oauth/access_token', {
-                client_id: process.env['CLIENT_ID'],
-                client_secret: process.env['CLIENT_SECRET'],
-                code,
-            }).then(({data}) => {
-                const {access_token} = _parseParams(data);
-                res.redirect(302, `${redirect}#access_token=${access_token}`);
-            });
-            break;
+    case 'github':
+        axios.post('https://github.com/login/oauth/access_token', {
+            client_id: process.env['CLIENT_ID'],
+            client_secret: process.env['CLIENT_SECRET'],
+            code,
+        }).then(({data}) => {
+            const {access_token: accessToken} = _parseParams(data);
+            res.redirect(302, `${redirect}#access_token=${accessToken}`);
+        });
+        break;
     }
 });
 

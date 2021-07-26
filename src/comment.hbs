@@ -8,7 +8,7 @@
                 <div class="note-item clearfix" comment-id="{{id}}">
                     <a href="{{author.info}}" target="_blank"><img src="{{author.avatar}}" class="user-avatar {{#unless active}}disabled{{/unless}}"
                                                                    alt="gitlab-comment-avatar"/></a>
-                    <div class="comment-note" data-content="{{stringify content}}">{{{markedown content}}}</div>
+                    <div class="comment-note" data-content="{{stringify content}}">{{{markdown content}}}</div>
                     <p class="comment-description">
                         <span class="name">{{author.name}}</span>
                         <span class="username"><a href="{{author.info}}" target="_blank">@{{author.username}}</a></span>
@@ -23,8 +23,8 @@
                         </span>
                         {{#if owner}}
                             <span class="comment-operations">
-                                <i class="fa fa-pencil-square-o" title="edit" action="edit"></i>
-                                <i class="fa fa-trash-o" title="remove" action="remove"></i>
+                                <i class="fa fa-pencil-square-o" title="edit" data-action="edit"></i>
+                                <i class="fa fa-trash-o" title="remove" data-action="remove"></i>
                             </span>
                         {{/if}}
                     </p>
@@ -33,7 +33,7 @@
             {{#compare this.0.type '===' 'gitlab'}}
                 <div class="slider"></div>
                 <div class="reply-wrapper editor">
-                    <div class="reply" title="Add a reply" action="reply">Reply...</div>
+                    <div class="reply" title="Add a reply" data-action="reply">Reply...</div>
                 </div>
             {{/compare}}
         </div>

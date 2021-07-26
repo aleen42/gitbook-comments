@@ -1,5 +1,5 @@
 module.exports = {
-    set(key, value, expiration = ''/* millisecond */) {
+    set(key, value, expiration = 0/* millisecond */) {
         const _expires = () => {
             const date = new Date();
             expiration && date.setTime(date.getTime() + expiration);

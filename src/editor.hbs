@@ -1,12 +1,12 @@
 {{#if reply}}
-    <i class="btn cancel-btn fa fa-times" action="cancelReply"></i>
-    <i class="btn modify-btn fa fa-check" action="doReply"></i>
+    <i class="btn cancel-btn fa fa-times" data-action="cancelReply"></i>
+    <i class="btn modify-btn fa fa-check" data-action="doReply"></i>
 {{/if}}
 {{#if modify}}
-    <i class="btn cancel-btn fa fa-times" action="cancelEdit"></i>
-    <i class="btn modify-btn fa fa-check" action="doEdit"></i>
+    <i class="btn cancel-btn fa fa-times" data-action="cancelEdit"></i>
+    <i class="btn modify-btn fa fa-check" data-action="doEdit"></i>
 {{/if}}
 {{#if send}}
-    <i class="btn send-btn fa fa-paper-plane" action="send"></i>
+    <i class="btn send-btn fa fa-paper-plane" data-action="send"></i>
 {{/if}}
 <textarea></textarea>
