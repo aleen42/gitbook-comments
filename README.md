@@ -2,7 +2,7 @@
 
 A project focusing on comments integrated with code management providers like GitLab or GitHub.
 
-![npm](https://aleen42.github.io/badges/src/npm.svg) ![javascript](https://aleen42.github.io/badges/src/javascript.svg) ![gitbook](https://aleen42.github.io/badges/src/gitbook_1.svg) ![gitbook](https://aleen42.github.io/badges/src/gitbook_2.svg)
+![npm](https://badges.aleen42.com/src/npm.svg) ![javascript](https://badges.aleen42.com/src/javascript.svg) ![gitbook](https://badges.aleen42.com/src/gitbook_1.svg) ![gitbook](https://badges.aleen42.com/src/gitbook_2.svg)
 
 ![](https://img.shields.io/badge/%20%20JavaScript-%20%20%20%2041,538L-f1e05a.svg) ![](https://img.shields.io/badge/%20%20CSS-%20%20%20%20961L-563d7c.svg) [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/aleen42/gitbook-comments/master/LICENSE) [![npm](https://img.shields.io/npm/dt/gitbook-plugin-comments-footer.svg)](https://www.npmjs.com/package/gitbook-plugin-comments-footer)
 
@@ -125,8 +125,12 @@ And then, the configuration option can be set as an object like the following sn
 
 ### :fuelpump: How to contribute
 
-Have an idea? Found a bug? See [how to contribute](https://aleen42.github.io/PersonalWiki/contribution.html).
+Have an idea? Found a bug? See [how to contribute](https://wiki.aleen42.com/contribution.html).
 
 ### :scroll: License
 
-[MIT](https://aleen42.github.io/PersonalWiki/MIT.html) © aleen42
+[MIT](https://wiki.aleen42.com/MIT.html) © aleen42
+
+*Note: if you like this project, feel free to buy me a swimming chance:*
+
+[![badges](https://badges.aleen42.com/src/paypal.svg)](http://paypal.me/aleen42) [![badges](https://badges.aleen42.com/src/patreon.svg)](https://www.patreon.com/aleen42) [![badges](https://badges.aleen42.com/src/buymeacoffee.svg)](https://www.buymeacoffee.com/aleen42)
