@@ -66,6 +66,6 @@ Handlebars.registerHelper('compare', function () {
         } else {
             throw new Error(`Handlebars Helper "compare" doesn't know the operator ${operator}`);
         }
-    })(values);
+    })(...values);
     return fn ? (result ? fn(this) : inverse(this)) : result;
 });
