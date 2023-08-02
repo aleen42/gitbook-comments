@@ -116,6 +116,7 @@ And then, the configuration option can be set as an object like the following sn
         * avoid empty token
         * fix wrong z-index of book header
         * base64 encode token to avoid detection of GitHub
+    * 1.6.0 migrate the server from Heroku to deta.space
 
 ### Q&A
 
