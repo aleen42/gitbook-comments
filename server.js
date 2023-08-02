@@ -20,7 +20,7 @@ app.use((req, res, next) => {
     next();
 });
 
-app.get('/gitbook-comments/redirect', (req, res) => {
+app.get('/redirect', (req, res) => {
     const {
         type = 'github',
         redirect,
@@ -29,12 +29,12 @@ app.get('/gitbook-comments/redirect', (req, res) => {
 
     res.redirect(301, `${authorized}?${[
         `client_id=${process.env['CLIENT_ID']}`,
-        `redirect_url=${encodeURIComponent('https://gitbook-comments.herokuapp.com/gitbook-comments/auth')}`,
+        `redirect_url=${encodeURIComponent('https://gitbook-comments.aleen42.com/auth')}`,
         `state=${encodeURIComponent(JSON.stringify({redirect, type}))}`,
     ].join('&')}`);
 });
 
-app.get('/gitbook-comments/auth', (req, res) => {
+app.get('/auth', (req, res) => {
     const {
         code,
         state,

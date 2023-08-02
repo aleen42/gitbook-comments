@@ -1,0 +1,22 @@
+# Spacefile Docs: https://go.deta.dev/docs/spacefile/v0
+v: 0
+micros:
+  - name: gitbook-comments
+    src: .
+    engine: nodejs16
+    run: "node ./server.js"
+    primary: true
+    presets:
+      env:
+        - name: CLIENT_ID
+          description: The Client ID of the GitHub application
+          default: ""
+        - name: CLIENT_SECRET
+          description: The Client Secret of the GitHub application
+          default: ""
+        - name: GITHUB_TOKEN
+          description: The access token of the GitHub account
+          default: ""
+        - name: GITLAB_TOKEN
+          description: The access token of the GitLab account
+          default: ""

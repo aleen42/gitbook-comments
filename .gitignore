@@ -64,3 +64,5 @@ typings/
 .idea
 
 package-lock.json
+
+.space

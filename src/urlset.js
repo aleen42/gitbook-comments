@@ -2,7 +2,7 @@
 
 const urls = {
     github: {
-        'oauth.redirect': () => `https://gitbook-comments.herokuapp.com/gitbook-comments/redirect?${$.param({
+        'oauth.redirect': () => `https://gitbook-comments.aleen42.com/redirect?${$.param({
             redirect: location.href.replace(/#.*$/gi, ''),
             authorized: `${SYS_CONST.host}/login/oauth/authorize`,
         })}`,

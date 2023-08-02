@@ -9,7 +9,7 @@
     "start": "node ./server.js"
   },
   "engines": {
-    "node": "10.x",
+    "node": ">=16",
     "gitbook": ">=3.2.2"
   },
   "repository": {
@@ -27,6 +27,9 @@
     "url": "https://github.com/aleen42/gitbook-comments/issues"
   },
   "dependencies": {
+    "axios": "0.19.2",
+    "body-parser": "1.18.3",
+    "express": "4.16.4",
     "handlebars": "4.5.3",
     "marked": "1.1.1",
     "moment": "2.24.0",
@@ -34,16 +37,13 @@
   },
   "homepage": "https://github.com/aleen42/gitbook-comments#readme",
   "devDependencies": {
-    "axios": "0.19.2",
     "babel-core": "6.26.2",
     "babel-loader": "7.1.4",
     "babel-preset-env": "1.7.0",
     "babel-preset-es2015": "6.24.1",
-    "body-parser": "1.18.3",
     "css-loader": "2.1.1",
     "eslint": "^7.4.0",
     "eslint-config-aleen42": "1.0.7",
-    "express": "4.16.4",
     "less": "3.9.0",
     "less-loader": "4.1.0",
     "mini-css-extract-plugin": "0.6.0",

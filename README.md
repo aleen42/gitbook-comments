@@ -78,7 +78,7 @@ And then, the configuration option can be set as an object like the following sn
 ### TODO
 
 - [ ] Disable subscribing states when commenting on articles.
-- [ ] Heroku is UNSTABLE for GitHub authorization!
+- [x] ~~Heroku is UNSTABLE for GitHub authorization!~~ Migrated to [deta.space](https://deta.space/)
 - [x] Replying features on GitLab.
 - [x] ~~GitLab features depend on the functions around commit comments: https://gitlab.com/gitlab-org/gitlab-ce/issues/59798.~~ Use discussion instead.
 - [x] ~~GitLab private access token has no detailed scope for avoiding abusing by others.~~ It means that I cannot get discussions when users do not authorize themselves.
