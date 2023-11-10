@@ -27,7 +27,7 @@
     "url": "https://github.com/aleen42/gitbook-comments/issues"
   },
   "dependencies": {
-    "axios": "0.19.2",
+    "axios": "1.6.0",
     "body-parser": "1.18.3",
     "express": "4.16.4",
     "handlebars": "4.5.3",
